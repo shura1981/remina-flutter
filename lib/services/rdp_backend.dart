@@ -37,7 +37,10 @@ class RdpBackend {
       '/title:${profile.name}',
       '/log-level:WARN',
       profile.flag('disableclipboard') ? '-clipboard' : '+clipboard',
-      profile.flag('cert_ignore') ? '/cert:ignore' : '/cert:deny',
+      (profile.flag('cert_ignore') || profile.flag('ignore-tls-errors'))
+          ? '/cert:ignore'
+          : '/cert:deny',
+
     ];
     if (profile.domain.isNotEmpty) args.add('/d:${profile.domain}');
     final mode = profile.get('resolution_mode', '2');

@@ -42,6 +42,36 @@ static void my_application_activate(GApplication* application) {
     }
   }
 #endif
+  GtkSettings* gtk_settings = gtk_settings_get_default();
+  if (gtk_settings != nullptr) {
+    g_object_set(gtk_settings, "gtk-application-prefer-dark-theme", TRUE, nullptr);
+  }
+
+  GtkCssProvider* provider = gtk_css_provider_new();
+  gtk_css_provider_load_from_data(
+      provider,
+      "headerbar {"
+      "  background: #14151c;"
+      "  background-color: #14151c;"
+      "  color: #f0f0f0;"
+      "  border-bottom: 1px solid rgba(255, 255, 255, 0.08);"
+      "  box-shadow: none;"
+      "}"
+      "headerbar .title {"
+      "  color: #e0e0e0;"
+      "  font-weight: 500;"
+      "  font-size: 13px;"
+      "}"
+      "headerbar button.titlebutton, headerbar windowcontrols button {"
+      "  color: #e0e0e0;"
+      "}",
+      -1, nullptr);
+  gtk_style_context_add_provider_for_screen(
+      gdk_screen_get_default(),
+      GTK_STYLE_PROVIDER(provider),
+      GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  g_object_unref(provider);
+
   if (use_header_bar) {
     GtkHeaderBar* header_bar = GTK_HEADER_BAR(gtk_header_bar_new());
     gtk_widget_show(GTK_WIDGET(header_bar));
@@ -51,6 +81,7 @@ static void my_application_activate(GApplication* application) {
   } else {
     gtk_window_set_title(window, "Remina");
   }
+
 
   gtk_window_set_default_size(window, 1280, 800);
   gtk_widget_set_size_request(GTK_WIDGET(window), 1040, 680);

@@ -375,9 +375,13 @@ class _ConnectionLibraryState extends State<ConnectionLibrary>
           'name': server,
           'server': server,
           'protocol': quickProtocol,
-          'resolution_mode': '2',
+          'resolution_mode': '1',
           'scale': '2',
+          'cert_ignore': '1',
+          'ignore-tls-errors': '1',
         },
+
+
       ),
       temporary: true,
     );

@@ -42,10 +42,15 @@ class _ProfileEditorState extends State<_ProfileEditor> {
     if (_protocol.isEmpty) _protocol = 'RDP';
     _sshAuth = _value('ssh_auth', '0');
     _resolutionMode = _value('resolution_mode', '1');
+
     _colorDepth = _value('colordepth', '32');
     _clipboard = !(widget.profile?.flag('disableclipboard') ?? false);
-    _ignoreCertificate = widget.profile?.flag('cert_ignore') ?? false;
-    _dynamicResolution = _value('scale') == '2';
+    _ignoreCertificate = widget.profile == null
+        ? true
+        : ((widget.profile?.flag('cert_ignore') ?? false) ||
+            (widget.profile?.flag('ignore-tls-errors') ?? false));
+    _dynamicResolution = widget.profile == null ? true : _value('scale') == '2';
+
     for (final key in [
       'name',
       'group',
@@ -98,6 +103,8 @@ class _ProfileEditorState extends State<_ProfileEditor> {
       values['colordepth'] = _colorDepth;
       values['disableclipboard'] = _clipboard ? '0' : '1';
       values['cert_ignore'] = _ignoreCertificate ? '1' : '0';
+      values['ignore-tls-errors'] = _ignoreCertificate ? '1' : '0';
+
     }
     Navigator.of(context).pop(
       widget.profile?.copyWith(values: values) ??

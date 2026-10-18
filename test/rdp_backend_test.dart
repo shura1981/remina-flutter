@@ -221,6 +221,14 @@ void main() {
       );
     });
 
+    test('recognizes ignore-tls-errors from modern Remmina profiles', () {
+      final arguments = RdpBackend.arguments(
+        profile({'ignore-tls-errors': '1'}),
+      );
+      expect(arguments, contains('/cert:ignore'));
+    });
+
+
     test(
       'gateway explicitly reuses desktop username when no gateway user is set',
       () {
