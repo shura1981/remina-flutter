@@ -20,3 +20,6 @@ coverage/
 *.key
 .env*
 dist/
+
+__pycache__/
+*.pyc

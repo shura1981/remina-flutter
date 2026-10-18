@@ -9,6 +9,7 @@ import 'models/remmina_profile.dart';
 import 'services/credentials.dart';
 import 'services/preferences.dart';
 import 'services/profile_repository.dart';
+import 'services/rdp_backend.dart';
 import 'sessions/rdp_session.dart';
 import 'sessions/ssh_session.dart';
 import 'ui/profile_editor.dart';
@@ -390,6 +391,34 @@ class _ConnectionLibraryState extends State<ConnectionLibrary>
       );
       return;
     }
+    if (p.protocol == 'RDP' && await RdpBackend.findExecutable() == null) {
+      if (!mounted || _exiting) return;
+      final openPreferences = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Falta el motor de conexión RDP'),
+          content: SizedBox(
+            width: 480,
+            child: SelectableText(RdpBackend.installationHelp()),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cerrar'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Preferencias'),
+            ),
+          ],
+        ),
+      );
+      if (openPreferences == true && mounted && !_exiting) {
+        await _preferences();
+      }
+      return;
+    }
+    if (!mounted || _exiting) return;
     String saved = '';
     try {
       saved = await credentials.read(p.id) ?? '';
@@ -574,7 +603,6 @@ class _ConnectionLibraryState extends State<ConnectionLibrary>
             profile: sessionProfile,
             password: result.password,
             gatewayPassword: result.gateway,
-            executable: widget.preferences.freerdpPath,
           );
     if (mounted && !_exiting) {
       setState(() {
@@ -615,42 +643,29 @@ class _ConnectionLibraryState extends State<ConnectionLibrary>
   }
 
   Future<void> _preferences() async {
-    final path = TextEditingController(text: widget.preferences.freerdpPath);
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Preferencias'),
-        content: SizedBox(
+        content: const SizedBox(
           width: 480,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Motor de escritorio remoto',
+              Text(
+                'Conexiones remotas',
                 style: TextStyle(fontWeight: FontWeight.w600),
               ),
-              const SizedBox(height: 12),
-              const Text(
-                'RDP abre FreeRDP 3 en una ventana nativa. En macOS puedes instalarlo con Homebrew:',
+              SizedBox(height: 12),
+              Text(
+                'La aplicación incluye el motor RDP y sus bibliotecas. '
+                'No necesitas instalar ni configurar un cliente externo.',
               ),
-              const SizedBox(height: 10),
-              const SelectableText(
-                'brew install freerdp',
-                style: TextStyle(fontFamily: 'monospace'),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: path,
-                decoration: const InputDecoration(
-                  labelText: 'Ruta del ejecutable FreeRDP',
-                  hintText: 'Vacío: detectar automáticamente',
-                ),
-              ),
-              const SizedBox(height: 18),
-              const Text(
-                'SSH se ejecuta dentro de la app. Los perfiles VNC, SFTP y otros se conservan al importar, pero todavía no pueden conectarse.',
-                style: TextStyle(fontSize: 12),
+              SizedBox(height: 12),
+              Text(
+                'El escritorio RDP abre una ventana propia. SSH se muestra '
+                'dentro de la app. Los protocolos VNC y SFTP todavía no están disponibles.',
               ),
             ],
           ),
@@ -658,20 +673,11 @@ class _ConnectionLibraryState extends State<ConnectionLibrary>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () async {
-              widget.preferences.freerdpPath = path.text.trim();
-              await _guard(widget.preferences.save);
-              if (context.mounted) Navigator.pop(context);
-            },
-            child: const Text('Guardar'),
+            child: const Text('Cerrar'),
           ),
         ],
       ),
     );
-    Future<void>.delayed(const Duration(milliseconds: 350), path.dispose);
   }
 
   @override

@@ -1,2 +1,5 @@
 #include "../../Flutter/Flutter-Release.xcconfig"
 #include "Warnings.xcconfig"
+
+// Build a distribution for this builder architecture, matching the bundled engine.
+ARCHS = $(NATIVE_ARCH_ACTUAL)

@@ -9,6 +9,18 @@ set(BINARY_NAME "remina")
 # https://wiki.gnome.org/HowDoI/ChooseApplicationID
 set(APPLICATION_ID "dev.steven.remina")
 
+# Flutter runs the install target to assemble its local bundle. Resolve the
+# default before subprojects/plugins can change CMake's initialization flag,
+# and repair caches left at the system default by a previous failed build.
+set(BUILD_BUNDLE_DIR "${PROJECT_BINARY_DIR}/bundle")
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT OR
+   CMAKE_INSTALL_PREFIX STREQUAL "/usr/local")
+  set(CMAKE_INSTALL_PREFIX "${BUILD_BUNDLE_DIR}" CACHE PATH
+      "Flutter application bundle directory" FORCE)
+endif()
+
+
+
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.
 cmake_policy(SET CMP0063 NEW)
@@ -76,12 +88,7 @@ include(flutter/generated_plugins.cmake)
 
 
 # === Installation ===
-# By default, "installing" just makes a relocatable bundle in the build
-# directory.
-set(BUILD_BUNDLE_DIR "${PROJECT_BINARY_DIR}/bundle")
-if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  set(CMAKE_INSTALL_PREFIX "${BUILD_BUNDLE_DIR}" CACHE PATH "..." FORCE)
-endif()
+# The install prefix was resolved above, before configuring subprojects.
 
 # Start with a clean build bundle directory every time.
 install(CODE "
@@ -126,3 +133,18 @@ if(NOT CMAKE_BUILD_TYPE MATCHES "Debug")
   install(FILES "${AOT_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
     COMPONENT Runtime)
 endif()
+
+# Assemble the engine and native runtime into the final bundle. Missing inputs
+# are build errors; end users must never install an RDP engine themselves.
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+install(CODE "
+  execute_process(
+    COMMAND \"${Python3_EXECUTABLE}\"
+      \"${CMAKE_SOURCE_DIR}/../tools/packaging/bundle_runtime.py\"
+      --platform linux --root \"${CMAKE_INSTALL_PREFIX}\"
+    RESULT_VARIABLE REMINA_PACKAGE_RESULT
+  )
+  if(NOT REMINA_PACKAGE_RESULT EQUAL 0)
+    message(FATAL_ERROR \"Failed to bundle the RDP engine and runtime libraries\")
+  endif()
+" COMPONENT Runtime)

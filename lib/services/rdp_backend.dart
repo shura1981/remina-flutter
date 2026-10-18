@@ -7,6 +7,13 @@ import '../models/remmina_profile.dart';
 /// Translates the supported Remmina settings into FreeRDP 3 arguments.
 /// Credentials travel through stdin, never through the process argument list.
 class RdpBackend {
+  static String installationHelp({String? operatingSystem}) {
+    return 'Esta copia de Remina está incompleta: falta el motor RDP incluido '
+        'en la aplicación. Vuelve a generar o descargar el paquete completo '
+        'para ${operatingSystem ?? Platform.operatingSystem}. '
+        'La contraseña todavía no se ha enviado al servidor.';
+  }
+
   static List<String> arguments(RemminaProfile profile) {
     if (profile.server.trim().isEmpty || profile.username.trim().isEmpty) {
       throw const FormatException('Completa servidor y usuario en el perfil.');
@@ -101,24 +108,26 @@ class RdpBackend {
     return args;
   }
 
-  static Future<String?> findExecutable({String? preferred}) async {
+  static Future<String?> findExecutable({
+    String? preferred,
+    Map<String, String>? environment,
+    String? appExecutablePath,
+    String? operatingSystem,
+  }) async {
+    final appDirectory = File(appExecutablePath ?? Platform.resolvedExecutable)
+        .absolute
+        .parent
+        .path;
+    final system = operatingSystem ?? Platform.operatingSystem;
+    final bundledRoot =
+        (environment ?? Platform.environment)['REMINA_BUNDLE_DIR'] ??
+        appDirectory;
     final candidates = <String>[
+      // Explicit injection is for controlled tests/developer tooling only.
+      // The production UI never sets it and never searches PATH or HOME.
       if (preferred != null && preferred.isNotEmpty) preferred,
-      if (Platform.environment['REMINA_FREERDP'] case final String path) path,
-      if (Platform.isMacOS) ...[
-        '/opt/homebrew/bin/sdl-freerdp',
-        '/usr/local/bin/sdl-freerdp',
-        '/opt/homebrew/bin/sdl-freerdp3',
-        '/usr/local/bin/sdl-freerdp3',
-      ],
-      for (final dir in (Platform.environment['PATH'] ?? '').split(':'))
-        for (final name in [
-          'sdl-freerdp',
-          'sdl-freerdp3',
-          'xfreerdp3',
-          'xfreerdp',
-        ])
-          if (dir.isNotEmpty) '$dir/$name',
+      if (system == 'macos') '$appDirectory/remina-rdp',
+      if (system == 'linux') '$bundledRoot/rdp/bin/remina-rdp',
     ];
     for (final candidate in candidates) {
       final file = File(candidate);
@@ -149,14 +158,21 @@ class RdpBackend {
     final args = arguments(profile);
     final path = await findExecutable(preferred: executable);
     if (path == null) {
-      throw const ProcessException(
-        'FreeRDP',
-        [],
-        'Instala FreeRDP 3. En macOS: brew install freerdp. '
-            'También puedes indicar su ejecutable en Preferencias.',
-      );
+      throw ProcessException('FreeRDP', const [], installationHelp());
     }
-    final process = await Process.start(path, args, runInShell: false);
+    final process = await Process.start(
+      path,
+      args,
+      runInShell: false,
+      environment: Platform.isMacOS
+          ? {
+              'SSL_CERT_FILE':
+                  '${File(path).parent.path}/../Resources/rdp-cacert.pem',
+              'OPENSSL_MODULES':
+                  '${File(path).parent.path}/../Frameworks/ReminaRdp/ossl-modules',
+            }
+          : null,
+    );
     try {
       process.stdin.writeln(password);
       if (profile.get('gateway_server').isNotEmpty) {

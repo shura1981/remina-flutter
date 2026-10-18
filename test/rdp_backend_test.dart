@@ -18,6 +18,75 @@ RemminaProfile profile([Map<String, String> settings = const {}]) =>
     );
 
 void main() {
+  group('bundled engine discovery', () {
+    test(
+      'missing bundle asks for a complete app, never a separate install',
+      () {
+        for (final system in ['linux', 'macos']) {
+          final help = RdpBackend.installationHelp(operatingSystem: system);
+          expect(help, contains('paquete completo'));
+          expect(help, isNot(contains('brew')));
+          expect(help, isNot(contains('apt-get')));
+          expect(help, contains('todavía no se ha enviado'));
+        }
+      },
+    );
+
+    test('discovers a relocated bundled engine without PATH or HOME', () async {
+      final temporary = await Directory.systemTemp.createTemp('remina bundle ');
+      try {
+        for (final system in ['linux', 'macos']) {
+          final app = system == 'macos'
+              ? '${temporary.path}/Remina.app/Contents/MacOS/Remina'
+              : '${temporary.path}/linux/remina.bin';
+          final directory = File(app).parent.path;
+          final path = system == 'macos'
+              ? '$directory/remina-rdp'
+              : '$directory/rdp/bin/remina-rdp';
+          final file = File(path);
+          await file.parent.create(recursive: true);
+          await file.writeAsString('#!/bin/sh\nexit 0\n');
+          await Process.run('chmod', ['700', path]);
+          expect(
+            await RdpBackend.findExecutable(
+              appExecutablePath: app,
+              operatingSystem: system,
+              environment: {'HOME': '/nonexistent', 'PATH': ''},
+            ),
+            path,
+          );
+          await Process.run('chmod', ['600', path]);
+          expect(
+            await RdpBackend.findExecutable(
+              appExecutablePath: app,
+              operatingSystem: system,
+            ),
+            isNull,
+          );
+        }
+      } finally {
+        await temporary.delete(recursive: true);
+      }
+    }, skip: !Platform.isLinux && !Platform.isMacOS);
+
+    test(
+      'never falls back to a host engine when the bundle is incomplete',
+      () async {
+        expect(
+          await RdpBackend.findExecutable(
+            appExecutablePath: '/nonexistent/remina',
+            operatingSystem: 'linux',
+            environment: {
+              'HOME': Platform.environment['HOME'] ?? '',
+              'PATH': Platform.environment['PATH'] ?? '',
+            },
+          ),
+          isNull,
+        );
+      },
+    );
+  });
+
   group('Remmina to FreeRDP argument mapping', () {
     test('custom, client and initial resolutions remain distinct', () {
       final cases = {

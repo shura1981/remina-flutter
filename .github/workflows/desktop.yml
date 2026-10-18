@@ -9,15 +9,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dart-lang/setup-dart@v1
-      - run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libsecret-1-dev libstdc++-12-dev
+      - run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libsecret-1-dev libstdc++-12-dev freerdp3-x11 libegl1 libgles2 libgl1-mesa-dri fonts-dejavu-core ca-certificates gsettings-desktop-schemas
       - run: dart pub global activate fvm
       - run: fvm install && fvm flutter pub get
       - run: fvm flutter analyze && fvm flutter test
-      - run: fvm flutter build linux --release
+      - run: python3 -m unittest discover -s tools/packaging/tests
+      - run: tools/build_linux.sh
+      - run: python3 tools/packaging/verify_linux_bundle.py build/linux/x64/release/bundle --container ubuntu:24.04
       - uses: actions/upload-artifact@v4
         with:
           name: Remina-linux
-          path: build/linux/x64/release/bundle
+          path: dist/Remina-linux-*.tar.xz
   macos:
     runs-on: macos-latest
     steps:

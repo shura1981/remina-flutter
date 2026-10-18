@@ -56,6 +56,21 @@ static void my_application_activate(GApplication* application) {
   gtk_widget_set_size_request(GTK_WIDGET(window), 1040, 680);
 
   g_autoptr(FlDartProject) project = fl_dart_project_new();
+  // The portable launcher invokes our bundled ELF loader. In that case
+  // /proc/self/exe identifies the loader, so Flutter's resource paths must be
+  // set explicitly instead of inferred from the process executable.
+  const gchar* bundle_dir = g_getenv("REMINA_BUNDLE_DIR");
+  if (bundle_dir != nullptr) {
+    g_autofree gchar* assets = g_build_filename(
+        bundle_dir, "data", "flutter_assets", nullptr);
+    g_autofree gchar* icu = g_build_filename(
+        bundle_dir, "data", "icudtl.dat", nullptr);
+    g_autofree gchar* aot = g_build_filename(
+        bundle_dir, "lib", "libapp.so", nullptr);
+    fl_dart_project_set_assets_path(project, assets);
+    fl_dart_project_set_icu_data_path(project, icu);
+    fl_dart_project_set_aot_library_path(project, aot);
+  }
   fl_dart_project_set_dart_entrypoint_arguments(
       project, self->dart_entrypoint_arguments);
 

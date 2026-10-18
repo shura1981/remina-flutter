@@ -1,3 +1,11 @@
+# Validación del paquete con dependencias
+
+Verificación más reciente: análisis Dart sin incidencias, 52 pruebas Flutter aprobadas (1 fixture optativo omitido), 4 pruebas del empaquetador aprobadas. Build Linux debug y release completos. El motor incluido resolvió sus bibliotecas desde el paquete y arrancó en Ubuntu y Alpine sin FreeRDP instalado, en otra ruta y sin red. La interfaz se renderizó en contenedores Ubuntu y Alpine con pantalla Xvfb del equipo de pruebas, sin bibliotecas ni herramientas de desarrollo instaladas dentro del contenedor.
+
+[Captura aislada](portable-linux.png). [Arquitectura del paquete y límites](PORTABLE_PACKAGING.md). También se verificó el archivo `dist/Remina-linux-x86_64.tar.xz` tras extraerlo en una carpeta nueva. `fvm flutter run -d linux --no-resident` pasó en modo debug con el motor empaquetado. El build macOS sigue pendiente de ejecución en un Mac; no se probó autenticación RDP ni gateway contra servidores del usuario.
+
+---
+
 # Validación local
 
 Verificado el 18 de octubre de 2026 en Linux x86_64, usando FVM Flutter 3.47.7 / Dart 3.13.5.

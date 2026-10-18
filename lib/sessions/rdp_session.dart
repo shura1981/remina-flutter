@@ -89,7 +89,7 @@ class _RdpSessionViewState extends State<RdpSessionView> {
       _fail(e.message);
     } catch (_) {
       _fail(
-        'No se pudo iniciar FreeRDP. Revisa el ejecutable en Preferencias.',
+        'No se pudo iniciar el motor RDP incluido. Revisa que el paquete de la aplicación esté completo.',
       );
     }
   }
