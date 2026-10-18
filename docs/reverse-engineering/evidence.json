@@ -1,0 +1,1002 @@
+{
+  "binary": "/usr/bin/remmina",
+  "sha256": "66135e6da91f99a7f09c8088c52012856cb847f191b6867f40b87f39a47a5f78",
+  "observed_version": "1.4.43",
+  "method": "REA MCP / Hopper; static observations, not observed network sessions",
+  "evidence": [
+    {
+      "source": "inspect0",
+      "evidence_id": "ev_f11dd176796a7c7b07ae210b90d320a24990f05d58d972d2abd94b46e63c97e5",
+      "subject": {
+        "name": "remmina",
+        "digest": {
+          "sha256": "66135e6da91f99a7f09c8088c52012856cb847f191b6867f40b87f39a47a5f78"
+        },
+        "format": "elf",
+        "architecture": "x86_64",
+        "local_path": "/usr/bin/remmina"
+      },
+      "provider": {
+        "id": "rea-workflow",
+        "name": "REA composed investigation workflow",
+        "version": "1"
+      },
+      "operation": "binary_overview",
+      "limitations": [
+        "Derived by an REA workflow from one or more provider observations."
+      ],
+      "result": {
+        "document": "New Document",
+        "segments": [
+          {
+            "name": "Segment 2",
+            "start": "0x0",
+            "end": "0x209f8",
+            "length": 133624
+          },
+          {
+            "name": "Segment 3",
+            "start": "0x21000",
+            "end": "0x73cb1",
+            "length": 339121
+          },
+          {
+            "name": "Segment 4",
+            "start": "0x74000",
+            "end": "0xe5fa8",
+            "length": 466856
+          },
+          {
+            "name": "Segment 5",
+            "start": "0xe69e0",
+            "end": "0xec5f8",
+            "length": 23576
+          },
+          {
+            "name": "External Symbols",
+            "start": "0xec600",
+            "end": "0xee9a0",
+            "length": 9120
+          }
+        ],
+        "segment_count": 5,
+        "procedure_count": 3181,
+        "string_count": 2007
+      }
+    },
+    {
+      "source": "reaStage0",
+      "evidence_id": "ev_e69326a3a8cc7c257b6c5512018402e4d6af2b002af3de94a5e07e143c93d0e1",
+      "subject": {
+        "name": "remmina",
+        "digest": {
+          "sha256": "66135e6da91f99a7f09c8088c52012856cb847f191b6867f40b87f39a47a5f78"
+        },
+        "format": "elf",
+        "architecture": "x86_64",
+        "local_path": "/usr/bin/remmina"
+      },
+      "provider": {
+        "id": "hopper",
+        "name": "Hopper Disassembler",
+        "version": "launcher-sha256:0294ced141cc373468ee22d8343e7dac41980cb05a937994ca81c9f09afe7ded"
+      },
+      "operation": "search_procedures",
+      "limitations": [
+        "Results depend on Hopper's completed static analysis."
+      ],
+      "result": [
+        {
+          "address": "0x2a0d0",
+          "value": "remmina_file_get_filename"
+        },
+        {
+          "address": "0x2ab80",
+          "value": "remmina_file_get_int"
+        },
+        {
+          "address": "0x2abe0",
+          "value": "remmina_file_get_double"
+        },
+        {
+          "address": "0x2caf0",
+          "value": "remmina_file_set_filename"
+        },
+        {
+          "address": "0x2cb20",
+          "value": "remmina_file_set_statefile"
+        },
+        {
+          "address": "0x2cbd0",
+          "value": "remmina_file_set_state"
+        },
+        {
+          "address": "0x2cc40",
+          "value": "remmina_file_get_state_double"
+        },
+        {
+          "address": "0x2ccc0",
+          "value": "remmina_file_free"
+        },
+        {
+          "address": "0x2cd80",
+          "value": "remmina_file_get_state"
+        },
+        {
+          "address": "0x2cee0",
+          "value": "remmina_file_state_last_success"
+        },
+        {
+          "address": "0x2d070",
+          "value": "remmina_file_touch"
+        },
+        {
+          "address": "0x2d210",
+          "value": "remmina_file_set_int"
+        },
+        {
+          "address": "0x2d230",
+          "value": "remmina_file_editor_get_type"
+        },
+        {
+          "address": "0x2da70",
+          "value": "remmina_file_save"
+        },
+        {
+          "address": "0x2eeb0",
+          "value": "remmina_file_set_string"
+        },
+        {
+          "address": "0x2f170",
+          "value": "remmina_file_store_secret_plugin_password"
+        },
+        {
+          "address": "0x2f1f0",
+          "value": "remmina_file_dup"
+        },
+        {
+          "address": "0x2f2a0",
+          "value": "remmina_file_dup_temp_protocol"
+        },
+        {
+          "address": "0x2f2e0",
+          "value": "remmina_file_unsave_passwords"
+        },
+        {
+          "address": "0x2f500",
+          "value": "remmina_file_get_string"
+        },
+        {
+          "address": "0x2f5f0",
+          "value": "remmina_file_generate_filename"
+        },
+        {
+          "address": "0x2f890",
+          "value": "remmina_file_load"
+        },
+        {
+          "address": "0x2ff20",
+          "value": "remmina_file_new"
+        },
+        {
+          "address": "0x316f0",
+          "value": "remmina_file_copy"
+        },
+        {
+          "address": "0x31760",
+          "value": "remmina_file_delete"
+        },
+        {
+          "address": "0x317a0",
+          "value": "remmina_file_get_secret"
+        },
+        {
+          "address": "0x317f0",
+          "value": "remmina_file_format_properties"
+        },
+        {
+          "address": "0x31910",
+          "value": "remmina_file_get_icon_name"
+        },
+        {
+          "address": "0x319c0",
+          "value": "remmina_file_get_datetime"
+        },
+        {
+          "address": "0x359c0",
+          "value": "remmina_file_get_datadir"
+        },
+        {
+          "address": "0x38790",
+          "value": "remmina_file_editor_check_profile"
+        },
+        {
+          "address": "0x38830",
+          "value": "remmina_file_manager_free_group_tree"
+        },
+        {
+          "address": "0x3ae80",
+          "value": "remmina_file_manager_init"
+        },
+        {
+          "address": "0x3c460",
+          "value": "remmina_file_editor_file_save"
+        },
+        {
+          "address": "0x3c4c0",
+          "value": "remmina_file_manager_iterate"
+        },
+        {
+          "address": "0x3c5f0",
+          "value": "remmina_file_manager_get_group_tree"
+        },
+        {
+          "address": "0x3c760",
+          "value": "remmina_file_manager_get_groups"
+        },
+        {
+          "address": "0x3c930",
+          "value": "remmina_file_editor_new_from_file"
+        },
+        {
+          "address": "0x3d010",
+          "value": "remmina_file_editor_new_full"
+        },
+        {
+          "address": "0x3d070",
+          "value": "remmina_file_editor_new"
+        },
+        {
+          "address": "0x3d090",
+          "value": "remmina_file_editor_new_copy"
+        },
+        {
+          "address": "0x3d400",
+          "value": "remmina_file_manager_load_file"
+        },
+        {
+          "address": "0x3d470",
+          "value": "remmina_file_editor_new_from_filename"
+        }
+      ]
+    },
+    {
+      "source": "reaStage1",
+      "evidence_id": "ev_b3e4845795240a1e9c9ba8641caa4c43a78aaecc5ef4fe15ed789b6839bed8c7",
+      "subject": {
+        "name": "remmina",
+        "digest": {
+          "sha256": "66135e6da91f99a7f09c8088c52012856cb847f191b6867f40b87f39a47a5f78"
+        },
+        "format": "elf",
+        "architecture": "x86_64",
+        "local_path": "/usr/bin/remmina"
+      },
+      "provider": {
+        "id": "hopper",
+        "name": "Hopper Disassembler",
+        "version": "launcher-sha256:0294ced141cc373468ee22d8343e7dac41980cb05a937994ca81c9f09afe7ded"
+      },
+      "operation": "search_procedures",
+      "limitations": [
+        "Results depend on Hopper's completed static analysis."
+      ],
+      "result": [
+        {
+          "address": "0x38190",
+          "value": "remmina_main_on_action_application_default"
+        },
+        {
+          "address": "0x382d0",
+          "value": "remmina_main_toggle_password_view"
+        },
+        {
+          "address": "0x38560",
+          "value": "remmina_main_on_action_tools_import"
+        },
+        {
+          "address": "0x38630",
+          "value": "remmina_main_on_action_application_dark_theme"
+        },
+        {
+          "address": "0x386d0",
+          "value": "remmina_main_on_action_help_homepage"
+        },
+        {
+          "address": "0x386f0",
+          "value": "remmina_main_on_action_help_wiki"
+        },
+        {
+          "address": "0x38710",
+          "value": "remmina_main_on_action_help_community"
+        },
+        {
+          "address": "0x38730",
+          "value": "remmina_main_on_action_help_donations"
+        },
+        {
+          "address": "0x38750",
+          "value": "remmina_main_on_action_collapse"
+        },
+        {
+          "address": "0x38770",
+          "value": "remmina_main_on_action_expand"
+        },
+        {
+          "address": "0x3a030",
+          "value": "remmina_main_on_action_help_debug"
+        },
+        {
+          "address": "0x3a5f0",
+          "value": "remmina_main_on_action_search_toggle"
+        },
+        {
+          "address": "0x3b280",
+          "value": "remmina_main_save_before_destroy"
+        },
+        {
+          "address": "0x3b2b0",
+          "value": "remmina_main_destroy"
+        },
+        {
+          "address": "0x3b3d0",
+          "value": "remmina_main_on_delete_event"
+        },
+        {
+          "address": "0x3b410",
+          "value": "remmina_main_on_destroy_event"
+        },
+        {
+          "address": "0x3b4a0",
+          "value": "remmina_main_reload_preferences"
+        },
+        {
+          "address": "0x3b530",
+          "value": "remmina_main_quickconnect_on_click"
+        },
+        {
+          "address": "0x3b780",
+          "value": "remmina_main_quick_search_enter"
+        },
+        {
+          "address": "0x3b7d0",
+          "value": "remmina_main_file_list_on_button_press"
+        },
+        {
+          "address": "0x3b850",
+          "value": "remmina_main_file_list_on_key_press"
+        },
+        {
+          "address": "0x3b890",
+          "value": "remmina_main_quick_search_on_icon_press"
+        },
+        {
+          "address": "0x3b8b0",
+          "value": "remmina_main_on_window_state_event"
+        },
+        {
+          "address": "0x3b8c0",
+          "value": "remmina_main_on_show"
+        },
+        {
+          "address": "0x3d110",
+          "value": "remmina_main_on_action_connection_copy"
+        },
+        {
+          "address": "0x3d550",
+          "value": "remmina_main_on_action_connection_edit"
+        },
+        {
+          "address": "0x3f7e0",
+          "value": "remmina_main_load_files_cb"
+        },
+        {
+          "address": "0x3f810",
+          "value": "remmina_main_on_view_toggle"
+        },
+        {
+          "address": "0x3f8d0",
+          "value": "remmina_main_on_action_connection_delete"
+        },
+        {
+          "address": "0x3fb30",
+          "value": "remmina_main_on_action_connection_delete_multiple"
+        },
+        {
+          "address": "0x3fe40",
+          "value": "remmina_main_on_date_column_sort_clicked"
+        },
+        {
+          "address": "0x401f0",
+          "value": "remmina_main_on_drag_data_received"
+        },
+        {
+          "address": "0x40290",
+          "value": "remmina_main_quick_search_on_changed"
+        },
+        {
+          "address": "0x40350",
+          "value": "remmina_main_add_network_status"
+        },
+        {
+          "address": "0x404f0",
+          "value": "remmina_main_on_action_connection_connect"
+        },
+        {
+          "address": "0x40680",
+          "value": "remmina_main_file_list_on_row_activated"
+        },
+        {
+          "address": "0x406d0",
+          "value": "remmina_main_on_action_connection_connect_multiple"
+        },
+        {
+          "address": "0x409e0",
+          "value": "remmina_main_on_action_connection_external_tools"
+        },
+        {
+          "address": "0x40a10",
+          "value": "remmina_main_on_action_application_mpchange"
+        },
+        {
+          "address": "0x40bc0",
+          "value": "remmina_main_on_action_connection_new"
+        },
+        {
+          "address": "0x40d00",
+          "value": "remmina_main_on_action_application_preferences"
+        },
+        {
+          "address": "0x40e40",
+          "value": "remmina_main_on_action_application_quit"
+        },
+        {
+          "address": "0x40f00",
+          "value": "remmina_main_on_action_tools_export"
+        },
+        {
+          "address": "0x410c0",
+          "value": "remmina_main_on_action_application_plugins"
+        },
+        {
+          "address": "0x410e0",
+          "value": "remmina_main_on_action_application_about"
+        },
+        {
+          "address": "0x41100",
+          "value": "remmina_main_on_action_application_bug_report"
+        },
+        {
+          "address": "0x41120",
+          "value": "remmina_main_new"
+        },
+        {
+          "address": "0x41af0",
+          "value": "remmina_main_get_window"
+        },
+        {
+          "address": "0x41b60",
+          "value": "remmina_main_show_dialog"
+        },
+        {
+          "address": "0x428e0",
+          "value": "remmina_main_update_file_datetime"
+        },
+        {
+          "address": "0x42900",
+          "value": "remmina_main_show_warning_dialog"
+        }
+      ]
+    },
+    {
+      "source": "reaStage2",
+      "evidence_id": "ev_907756de87c87c4f52494158bf7eb91927ed5e96ca260caefee44a5a0c7d3e5c",
+      "subject": {
+        "name": "remmina",
+        "digest": {
+          "sha256": "66135e6da91f99a7f09c8088c52012856cb847f191b6867f40b87f39a47a5f78"
+        },
+        "format": "elf",
+        "architecture": "x86_64",
+        "local_path": "/usr/bin/remmina"
+      },
+      "provider": {
+        "id": "hopper",
+        "name": "Hopper Disassembler",
+        "version": "launcher-sha256:0294ced141cc373468ee22d8343e7dac41980cb05a937994ca81c9f09afe7ded"
+      },
+      "operation": "search_strings",
+      "limitations": [
+        "Results depend on Hopper's completed static analysis."
+      ],
+      "result": [
+        {
+          "address": "0x74098",
+          "value": "secret corrupted\\n"
+        },
+        {
+          "address": "0x74382",
+          "value": "org.remmina.Remmina"
+        },
+        {
+          "address": "0x7460b",
+          "value": "%s/%s.remmina"
+        },
+        {
+          "address": "0x74a8d",
+          "value": "resolution_mode"
+        },
+        {
+          "address": "0x74e44",
+          "value": "ssh_auth"
+        },
+        {
+          "address": "0x75216",
+          "value": "https://www.remmina.org"
+        },
+        {
+          "address": "0x75540",
+          "value": "org.remmina.Remmina-status"
+        },
+        {
+          "address": "0x75aa0",
+          "value": "Secret"
+        },
+        {
+          "address": "0x75c32",
+          "value": "secret"
+        },
+        {
+          "address": "0x765dd",
+          "value": "%G_%P_%N_%h.remmina"
+        },
+        {
+          "address": "0x772f9",
+          "value": "SSH_AUTH_METHOD_GSSAPI_MIC "
+        },
+        {
+          "address": "0x77315",
+          "value": "SSH_AUTH_METHOD_INTERACTIVE "
+        },
+        {
+          "address": "0x77332",
+          "value": "SSH_AUTH_METHOD_HOSTBASED "
+        },
+        {
+          "address": "0x7734d",
+          "value": "SSH_AUTH_METHOD_PUBLICKEY "
+        },
+        {
+          "address": "0x77368",
+          "value": "SSH_AUTH_METHOD_PASSWORD "
+        },
+        {
+          "address": "0x77382",
+          "value": "SSH_AUTH_METHOD_NONE "
+        },
+        {
+          "address": "0x773b4",
+          "value": "SSH_AUTH_PASSWORD (%d)"
+        },
+        {
+          "address": "0x77426",
+          "value": "SSH_AUTH_PUBLICKEY (%d)"
+        },
+        {
+          "address": "0x77499",
+          "value": "SSH_AUTH_AGENT (%d)"
+        },
+        {
+          "address": "0x774ad",
+          "value": "SSH_AUTH_AUTO_PUBLICKEY (%d)"
+        },
+        {
+          "address": "0x774ca",
+          "value": "SSH_AUTH_GSSAPI (%d)"
+        },
+        {
+          "address": "0x795b1",
+          "value": "ACTIVESECRETPLUGIN"
+        },
+        {
+          "address": "0x79860",
+          "value": "org.remmina.Remmina-password-reveal-symbolic"
+        },
+        {
+          "address": "0x79a20",
+          "value": "org.remmina.Remmina-document-send-symbolic"
+        },
+        {
+          "address": "0x79bd0",
+          "value": "We have a secret and disablepasswordstoring=0"
+        },
+        {
+          "address": "0x79c30",
+          "value": "Deleting the secret in the keyring as disablepasswordstoring=1"
+        },
+        {
+          "address": "0x7a668",
+          "value": "https://info.remmina.org/bug_report/bug_report"
+        },
+        {
+          "address": "0x7aa28",
+          "value": "Warning: Remmina is running without a secret plugin. Passwords will be saved in a less secure way.\\n"
+        },
+        {
+          "address": "0x7b4b0",
+          "value": "Connect either to a desktop described in a file (.remmina or a filetype supported by a plugin) or a supported URI (RDP, VNC, SSH, HTTP, HTTPS or SPICE)"
+        },
+        {
+          "address": "0x7b548",
+          "value": "Connect to a desktop described in a file (.remmina or a filetype supported by a plugin)"
+        },
+        {
+          "address": "0x7b5a0",
+          "value": "Edit desktop connection described in file (.remmina or a filetype supported by plugin)"
+        },
+        {
+          "address": "0x7b768",
+          "value": "org.remmina.Remmina-sftp-symbolic"
+        },
+        {
+          "address": "0x7b8e8",
+          "value": "org.remmina.Remmina-document-save-symbolic"
+        },
+        {
+          "address": "0x7b9c8",
+          "value": "org.remmina.Remmina-password-conceal-symbolic"
+        },
+        {
+          "address": "0x7ba50",
+          "value": "https://www.remmina.org/donations"
+        },
+        {
+          "address": "0x7c150",
+          "value": "flatpak run org.remmina.Remmina -i"
+        },
+        {
+          "address": "0x7c178",
+          "value": "org.remmina.Remmina-status-grey"
+        },
+        {
+          "address": "0x7c198",
+          "value": "org.remmina.Remmina-status-green"
+        },
+        {
+          "address": "0x7c1c0",
+          "value": "org.remmina.Remmina-status-red"
+        },
+        {
+          "address": "0x7c690",
+          "value": "Internal ERROR: remmina_secret_plugin must be null here\\n"
+        },
+        {
+          "address": "0x7c6d0",
+          "value": "The %s secret plugin has been initialized and it will be your default secret plugin"
+        },
+        {
+          "address": "0x7c7e0",
+          "value": "https://plugins.remmina.org/plugins/plugin_download"
+        },
+        {
+          "address": "0x7e520",
+          "value": "SSH using remmina_ssh_auth_interactive after password has failed"
+        },
+        {
+          "address": "0x7e568",
+          "value": "SSH using remmina_ssh_auth_password"
+        },
+        {
+          "address": "0x7e740",
+          "value": "SSH using remmina_ssh_auth_interactive"
+        },
+        {
+          "address": "0x7f3a0",
+          "value": "[SFTPCLI] remmina_ssh_auth returned error %s\\n"
+        },
+        {
+          "address": "0x81170",
+          "value": "org.remmina.Remmina-tool-symbolic"
+        },
+        {
+          "address": "0x81198",
+          "value": "org.remmina.Remmina-ssh-symbolic"
+        },
+        {
+          "address": "0x81758",
+          "value": "org.remmina.Remmina-pin-down-symbolic"
+        },
+        {
+          "address": "0x81780",
+          "value": "org.remmina.Remmina-pin-up-symbolic"
+        },
+        {
+          "address": "0x81a30",
+          "value": "org.remmina.Remmina-duplicate-symbolic"
+        },
+        {
+          "address": "0x81a58",
+          "value": "org.remmina.Remmina-fit-window-symbolic"
+        },
+        {
+          "address": "0x81ab0",
+          "value": "org.remmina.Remmina-fullscreen-symbolic"
+        },
+        {
+          "address": "0x81ad8",
+          "value": "org.remmina.Remmina-pan-down-symbolic"
+        },
+        {
+          "address": "0x81b00",
+          "value": "org.remmina.Remmina-multi-monitor-symbolic"
+        },
+        {
+          "address": "0x81b30",
+          "value": "org.remmina.Remmina-dynres-symbolic"
+        },
+        {
+          "address": "0x81b80",
+          "value": "org.remmina.Remmina-scale-symbolic"
+        },
+        {
+          "address": "0x81ba8",
+          "value": "org.remmina.Remmina-switch-page-symbolic"
+        },
+        {
+          "address": "0x81bd8",
+          "value": "org.remmina.Remmina-keyboard-symbolic"
+        },
+        {
+          "address": "0x81c00",
+          "value": "org.remmina.Remmina-preferences-system-symbolic"
+        },
+        {
+          "address": "0x81c30",
+          "value": "org.remmina.Remmina-system-run-symbolic"
+        },
+        {
+          "address": "0x81c58",
+          "value": "org.remmina.Remmina-camera-photo-symbolic"
+        },
+        {
+          "address": "0x81c88",
+          "value": "org.remmina.Remmina-go-bottom-symbolic"
+        },
+        {
+          "address": "0x81cb0",
+          "value": "org.remmina.Remmina-reconnect-symbolic"
+        },
+        {
+          "address": "0x81cd8",
+          "value": "org.remmina.Remmina-disconnect-symbolic"
+        },
+        {
+          "address": "0x83d70",
+          "value": "remmina_ssh_auth_gui"
+        },
+        {
+          "address": "0x83d90",
+          "value": "remmina_ssh_auth_password"
+        },
+        {
+          "address": "0x83db0",
+          "value": "remmina_ssh_auth_pubkey"
+        },
+        {
+          "address": "0x83dd0",
+          "value": "remmina_ssh_auth_agent"
+        },
+        {
+          "address": "0x83df0",
+          "value": "remmina_ssh_auth_auto_pubkey"
+        },
+        {
+          "address": "0x83e10",
+          "value": "remmina_ssh_auth_gssapi"
+        },
+        {
+          "address": "0x83e30",
+          "value": "remmina_ssh_auth"
+        },
+        {
+          "address": "0x83e50",
+          "value": "remmina_ssh_auth_interactive"
+        }
+      ]
+    },
+    {
+      "source": "reaDecompile",
+      "evidence_id": "ev_705842a0c78b456b4340ad09b5c4571a4b788fa1d2957ab766b743e47d4ab5b5",
+      "subject": {
+        "name": "remmina",
+        "digest": {
+          "sha256": "66135e6da91f99a7f09c8088c52012856cb847f191b6867f40b87f39a47a5f78"
+        },
+        "format": "elf",
+        "architecture": "x86_64",
+        "local_path": "/usr/bin/remmina"
+      },
+      "provider": {
+        "id": "rea-workflow",
+        "name": "REA composed investigation workflow",
+        "version": "1"
+      },
+      "operation": "batch_decompile",
+      "limitations": [
+        "Derived by an REA workflow from one or more provider observations."
+      ],
+      "result": {
+        "items": [
+          {
+            "address": "0x2f890",
+            "status": "ok"
+          },
+          {
+            "address": "0x2da70",
+            "status": "ok"
+          },
+          {
+            "address": "0x317a0",
+            "status": "ok"
+          },
+          {
+            "address": "0x3b530",
+            "status": "ok"
+          },
+          {
+            "address": "0x40290",
+            "status": "ok"
+          }
+        ],
+        "total": 5
+      }
+    },
+    {
+      "source": "reaRdpNames",
+      "evidence_id": "ev_3740617d537fbf06530bb811d65b5ab3cccccdc8dbac217d7c6781e7f916e496",
+      "subject": {
+        "name": "remmina-plugin-rdp.so",
+        "digest": {
+          "sha256": "c42c82730e5625581e023691b2767f664752fa6e2b5001f7f72178f65ce98b57"
+        },
+        "format": "elf",
+        "architecture": "x86_64",
+        "local_path": "/usr/lib/x86_64-linux-gnu/remmina/plugins/remmina-plugin-rdp.so"
+      },
+      "provider": {
+        "id": "hopper",
+        "name": "Hopper Disassembler",
+        "version": "launcher-sha256:0294ced141cc373468ee22d8343e7dac41980cb05a937994ca81c9f09afe7ded"
+      },
+      "operation": "search_procedures",
+      "limitations": [
+        "Results depend on Hopper's completed static analysis."
+      ],
+      "result": [
+        {
+          "address": "0xb860",
+          "value": "bindtextdomain@PLTSEC"
+        },
+        {
+          "address": "0xbc60",
+          "value": "gtk_main_iteration_do@PLTSEC"
+        },
+        {
+          "address": "0xbca0",
+          "value": "Stream_GetRemainingCapacity@PLTSEC"
+        },
+        {
+          "address": "0xbe20",
+          "value": "freerdp_connect@PLTSEC"
+        },
+        {
+          "address": "0xc070",
+          "value": "freerdp_shall_disconnect_context@PLTSEC"
+        },
+        {
+          "address": "0xc0b0",
+          "value": "freerdp_abort_connect_context@PLTSEC"
+        },
+        {
+          "address": "0xc0d0",
+          "value": "g_signal_handler_disconnect@PLTSEC"
+        },
+        {
+          "address": "0xc220",
+          "value": "g_signal_connect_data@PLTSEC"
+        },
+        {
+          "address": "0xc580",
+          "value": "freerdp_reconnect@PLTSEC"
+        },
+        {
+          "address": "0xc5b0",
+          "value": "bind_textdomain_codeset@PLTSEC"
+        },
+        {
+          "address": "0xc760",
+          "value": "freerdp_disconnect@PLTSEC"
+        },
+        {
+          "address": "0x17a50",
+          "value": "remmina_rdp_OnChannelDisconnectedEventHandler"
+        },
+        {
+          "address": "0x1bc20",
+          "value": "remmina_rdp_OnChannelConnectedEventHandler"
+        }
+      ]
+    },
+    {
+      "source": "reaRdpStrings",
+      "evidence_id": "ev_adb5c498769b815db97bed010c4aad4c64749efa26a548665e8785f790f91bd3",
+      "subject": {
+        "name": "remmina-plugin-rdp.so",
+        "digest": {
+          "sha256": "c42c82730e5625581e023691b2767f664752fa6e2b5001f7f72178f65ce98b57"
+        },
+        "format": "elf",
+        "architecture": "x86_64",
+        "local_path": "/usr/lib/x86_64-linux-gnu/remmina/plugins/remmina-plugin-rdp.so"
+      },
+      "provider": {
+        "id": "hopper",
+        "name": "Hopper Disassembler",
+        "version": "launcher-sha256:0294ced141cc373468ee22d8343e7dac41980cb05a937994ca81c9f09afe7ded"
+      },
+      "operation": "search_strings",
+      "limitations": [
+        "Results depend on Hopper's completed static analysis."
+      ],
+      "result": [
+        {
+          "address": "0x1c26e",
+          "value": "colordepth"
+        },
+        {
+          "address": "0x1c398",
+          "value": "gateway_usage"
+        },
+        {
+          "address": "0x1ccbe",
+          "value": "cert_ignore"
+        },
+        {
+          "address": "0x1d45c",
+          "value": "Dynamic virtual channel"
+        }
+      ]
+    },
+    {
+      "source": "reaRdpDecompile",
+      "evidence_id": "ev_a700fab18ea6deb611fa9b78682dc1cddbd4362f5248c662289212a0075716aa",
+      "subject": {
+        "name": "remmina-plugin-rdp.so",
+        "digest": {
+          "sha256": "c42c82730e5625581e023691b2767f664752fa6e2b5001f7f72178f65ce98b57"
+        },
+        "format": "elf",
+        "architecture": "x86_64",
+        "local_path": "/usr/lib/x86_64-linux-gnu/remmina/plugins/remmina-plugin-rdp.so"
+      },
+      "provider": {
+        "id": "rea-workflow",
+        "name": "REA composed investigation workflow",
+        "version": "1"
+      },
+      "operation": "batch_decompile",
+      "limitations": [
+        "Derived by an REA workflow from one or more provider observations."
+      ],
+      "result": {
+        "items": [
+          {
+            "address": "0x13850",
+            "status": "ok"
+          }
+        ],
+        "total": 1
+      }
+    }
+  ]
+}

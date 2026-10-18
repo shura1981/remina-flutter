@@ -1,0 +1,31 @@
+name: Desktop
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+      - run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libsecret-1-dev libstdc++-12-dev
+      - run: dart pub global activate fvm
+      - run: fvm install && fvm flutter pub get
+      - run: fvm flutter analyze && fvm flutter test
+      - run: fvm flutter build linux --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Remina-linux
+          path: build/linux/x64/release/bundle
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+      - run: dart pub global activate fvm
+      - run: tools/build_macos.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Remina-macos
+          path: dist/Remina-macos.zip

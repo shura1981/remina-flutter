@@ -1,0 +1,22 @@
+# Flutter / Dart
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+coverage/
+.flutter-plugins
+.flutter-plugins-dependencies
+# FVM SDK (configuration is committed)
+.fvm/
+# IDE and local data
+.idea/
+*.iml
+.DS_Store
+*.remmina
+*.remmina.state
+*.pref
+*.pem
+*.key
+.env*
+dist/
