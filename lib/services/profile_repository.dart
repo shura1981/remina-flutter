@@ -118,6 +118,54 @@ class ProfileRepository {
     await _atomicWrite(destination, profile.serialize());
   }
 
+  Future<int> exportAll(
+    List<RemminaProfile> profiles,
+    Directory destination,
+  ) async {
+    await destination.create(recursive: true);
+    final internalPath = await directory.exists()
+        ? await directory.resolveSymbolicLinks()
+        : directory.absolute.path;
+    final destPath = await destination.exists()
+        ? await destination.resolveSymbolicLinks()
+        : destination.absolute.path;
+    if (internalPath == destPath) {
+      throw const FileSystemException(
+        'Elige una carpeta diferente para exportar tus conexiones.',
+      );
+    }
+    final usedNames = <String>{};
+    int count = 0;
+    for (final profile in profiles) {
+      var name = profile.name.replaceAll(RegExp(r'[^\w\- ]'), '_').trim();
+      if (name.isEmpty) name = 'conexion_${profile.id}';
+      var filename = '$name.remmina';
+      int suffix = 1;
+      while (usedNames.contains(filename.toLowerCase())) {
+        filename = '${name}_$suffix.remmina';
+        suffix++;
+      }
+      usedNames.add(filename.toLowerCase());
+      final target = File('${destination.path}/$filename');
+      await exportProfile(profile, target);
+      count++;
+    }
+    return count;
+  }
+
+  Future<List<RemminaProfile>> importDirectory(Directory dir) async {
+    final files = <File>[];
+    if (await dir.exists()) {
+      await for (final entity in dir.list(followLinks: false)) {
+        if (entity is File && entity.path.endsWith('.remmina')) {
+          files.add(entity);
+        }
+      }
+    }
+    if (files.isEmpty) return [];
+    return importFiles(files);
+  }
+
   Future<void> _write(RemminaProfile profile) async {
     await directory.create(recursive: true);
     await _atomicWrite(_file(profile.id), profile.serialize());

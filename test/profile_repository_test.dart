@@ -136,4 +136,40 @@ void main() {
       expect(await exported.readAsString(), await source.readAsString());
     },
   );
+
+  test('exportAll writes all profiles and handles duplicate names', () async {
+    final p1 = RemminaProfile(
+      id: 'p1',
+      values: {'name': 'Servidor Web', 'server': '10.0.0.1'},
+    );
+    final p2 = RemminaProfile(
+      id: 'p2',
+      values: {'name': 'Servidor Web', 'server': '10.0.0.2'},
+    );
+    final p3 = RemminaProfile(
+      id: 'p3',
+      values: {'name': 'Base Datos', 'server': '10.0.0.3'},
+    );
+    await repository.save(p1);
+    await repository.save(p2);
+    await repository.save(p3);
+
+    final exportDir = Directory('${temporary.path}/export_folder');
+    final count = await repository.exportAll([p1, p2, p3], exportDir);
+    expect(count, 3);
+
+    final exportedFiles = await exportDir
+        .list()
+        .where((e) => e.path.endsWith('.remmina'))
+        .toList();
+    expect(exportedFiles, hasLength(3));
+
+    final cleanRepo = ProfileRepository(
+      Directory('${temporary.path}/clean_store'),
+    );
+    final imported = await cleanRepo.importDirectory(exportDir);
+    expect(imported, hasLength(3));
+    final loaded = await cleanRepo.load();
+    expect(loaded, hasLength(3));
+  });
 }

@@ -44,6 +44,17 @@ class MemoryRepository extends ProfileRepository {
   @override
   Future<void> exportProfile(RemminaProfile profile, File destination) async =>
       throw UnsupportedError('Native file selection is outside widget tests.');
+
+  @override
+  Future<int> exportAll(
+    List<RemminaProfile> profiles,
+    Directory destination,
+  ) async =>
+      profiles.length;
+
+  @override
+  Future<List<RemminaProfile>> importDirectory(Directory dir) async =>
+      throw UnsupportedError('Native file selection is outside widget tests.');
 }
 
 void main() {
@@ -188,5 +199,30 @@ void main() {
     await tester.tap(find.text('Cerrar'));
     await tester.pumpAndSettle();
     expect(find.text('Versión 1.0.0+1 · Multiplataforma'), findsNothing);
+  });
+
+  testWidgets('shows import options dialog with file and folder choices', (
+    tester,
+  ) async {
+    await openLibrary(tester, const Size(1280, 800));
+    await tester.tap(find.text('Importar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Importar conexiones'), findsOneWidget);
+    expect(find.text('Seleccionar archivos (.remmina)'), findsOneWidget);
+    expect(find.text('Seleccionar carpeta con conexiones'), findsOneWidget);
+    await tester.tap(find.text('Cancelar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Importar conexiones'), findsNothing);
+  });
+
+  testWidgets('shows export option inside preferences dialog', (tester) async {
+    await openLibrary(tester, const Size(1280, 800));
+    await tester.tap(find.text('Preferencias'));
+    await tester.pumpAndSettle();
+    expect(find.text('Migración y Copia de Seguridad'), findsOneWidget);
+    expect(find.text('Exportar todas las conexiones'), findsOneWidget);
+    await tester.tap(find.text('Cerrar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Migración y Copia de Seguridad'), findsNothing);
   });
 }

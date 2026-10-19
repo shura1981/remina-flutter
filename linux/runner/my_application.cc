@@ -58,7 +58,6 @@ static void my_application_activate(GApplication* application) {
   // The portable launcher invokes our bundled ELF loader. In that case
   // /proc/self/exe identifies the loader, so Flutter's resource paths must be
   // set explicitly instead of inferred from the process executable.
-  const gchar* bundle_dir = g_getenv("REMINA_BUNDLE_DIR");
   if (bundle_dir != nullptr) {
     g_autofree gchar* assets = g_build_filename(
         bundle_dir, "data", "flutter_assets", nullptr);

@@ -240,7 +240,10 @@ class _ConnectionLibraryState extends State<ConnectionLibrary>
     });
   }
 
-  Future<void> _import({bool detected = false}) async {
+  Future<void> _import({
+    bool detected = false,
+    bool fromDirectory = false,
+  }) async {
     if (repository == null || importing) return;
     setState(() => importing = true);
     await _guard(() async {
@@ -263,6 +266,23 @@ class _ConnectionLibraryState extends State<ConnectionLibrary>
           );
           return;
         }
+      } else if (fromDirectory) {
+        final path = await getDirectoryPath(
+          confirmButtonText: 'Importar desde carpeta',
+        );
+        if (path == null) return;
+        final dir = Directory(path);
+        if (await dir.exists()) {
+          await for (final f in dir.list(followLinks: false)) {
+            if (f is File && f.path.endsWith('.remmina')) files.add(f);
+          }
+        }
+        if (files.isEmpty) {
+          _message(
+            'No se encontraron archivos .remmina en la carpeta seleccionada.',
+          );
+          return;
+        }
       } else {
         final picked = await openFiles(
           acceptedTypeGroups: [
@@ -282,6 +302,85 @@ class _ConnectionLibraryState extends State<ConnectionLibrary>
       );
     });
     if (mounted) setState(() => importing = false);
+  }
+
+  Future<void> _showImportOptions() async {
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Importar conexiones'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.file_present_outlined),
+              title: const Text('Seleccionar archivos (.remmina)'),
+              subtitle: const Text('Elige uno o varios archivos .remmina'),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                _import();
+              },
+            ),
+            const SizedBox(height: 4),
+            ListTile(
+              leading: const Icon(Icons.folder_open_outlined),
+              title: const Text('Seleccionar carpeta con conexiones'),
+              subtitle: const Text('Importa todos los perfiles dentro de una carpeta'),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                _import(fromDirectory: true);
+              },
+            ),
+            if (Platform.isLinux) ...[
+              const SizedBox(height: 4),
+              ListTile(
+                leading: const Icon(Icons.computer_outlined),
+                title: const Text('Importar Remmina de este equipo'),
+                subtitle: const Text('Detecta perfiles en ~/.local/share/remmina'),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _import(detected: true);
+                },
+              ),
+            ],
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _exportAll() async {
+    if (repository == null || profiles.isEmpty) {
+      _message('No hay conexiones guardadas para exportar.');
+      return;
+    }
+    await _guard(() async {
+      final path = await getDirectoryPath(
+        confirmButtonText: 'Exportar aquí',
+      );
+      if (path == null) return;
+      final count = await repository!.exportAll(profiles, Directory(path));
+      _message(
+        '$count conexiones exportadas en formato .remmina. '
+        'Puedes copiarlas a otro equipo e importarlas en Remina Desktop o Remmina.',
+      );
+    });
   }
 
   Future<void> _export(RemminaProfile profile) async {
@@ -651,7 +750,7 @@ class _ConnectionLibraryState extends State<ConnectionLibrary>
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Preferencias'),
-        content: const SizedBox(
+        content: SizedBox(
           width: 480,
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -670,6 +769,27 @@ class _ConnectionLibraryState extends State<ConnectionLibrary>
               Text(
                 'El escritorio RDP abre una ventana propia. SSH se muestra '
                 'dentro de la app. Los protocolos VNC y SFTP todavía no están disponibles.',
+              ),
+              SizedBox(height: 20),
+              Text(
+                'Migración y Copia de Seguridad',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'Exporta todas tus conexiones en formato .remmina para transferirlas '
+                'a otro equipo o usarlas en Remmina Desktop / Remmina.',
+              ),
+              SizedBox(height: 12),
+              OutlinedButton.icon(
+                icon: Icon(Icons.file_upload_outlined, size: 16),
+                label: Text('Exportar todas las conexiones'),
+                onPressed: profiles.isEmpty
+                    ? null
+                    : () {
+                        Navigator.pop(context);
+                        _exportAll();
+                      },
               ),
             ],
           ),
@@ -978,7 +1098,7 @@ class _ConnectionLibraryState extends State<ConnectionLibrary>
                           onTap: _showAbout,
                           borderRadius: BorderRadius.circular(6),
                           child: const Padding(
-                            padding: EdgeInsets.fromLTRB(24, 16, 24, 20),
+                            padding: EdgeInsets.fromLTRB(24, 12, 24, 16),
                             child: Text(
                               'PERSONAL EDITION  /  v1.0.0',
                               style: TextStyle(
@@ -1172,6 +1292,7 @@ class _ConnectionLibraryState extends State<ConnectionLibrary>
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       switch (category) {
@@ -1181,6 +1302,8 @@ class _ConnectionLibraryState extends State<ConnectionLibrary>
                         'SSH' => 'Terminales SSH',
                         _ => 'Tus conexiones',
                       },
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.w600,
@@ -1190,18 +1313,44 @@ class _ConnectionLibraryState extends State<ConnectionLibrary>
                     const SizedBox(height: 5),
                     const Text(
                       'Un lugar para todos tus equipos remotos.',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(color: Colors.grey, fontSize: 12),
                     ),
                   ],
                 ),
               ),
               OutlinedButton.icon(
-                onPressed: importing ? null : () => _import(),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 12,
+                  ),
+                ),
+                onPressed: importing ? null : _showImportOptions,
                 icon: const Icon(Icons.file_download_outlined, size: 17),
                 label: Text(importing ? 'Importando…' : 'Importar'),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 8),
+              OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 12,
+                  ),
+                ),
+                onPressed: profiles.isEmpty ? null : _exportAll,
+                icon: const Icon(Icons.file_upload_outlined, size: 17),
+                label: const Text('Exportar'),
+              ),
+              const SizedBox(width: 8),
               FilledButton.icon(
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
+                ),
                 onPressed: () => _edit(),
                 icon: const Icon(Icons.add, size: 18),
                 label: const Text('Nueva conexión'),
@@ -1347,51 +1496,53 @@ class _ConnectionLibraryState extends State<ConnectionLibrary>
   }
 
   Widget _empty(bool noProfiles) => Center(
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(22),
-          decoration: BoxDecoration(
-            color: accent.withValues(alpha: .08),
-            borderRadius: BorderRadius.circular(22),
+    child: SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(22),
+            decoration: BoxDecoration(
+              color: accent.withValues(alpha: .08),
+              borderRadius: BorderRadius.circular(22),
+            ),
+            child: Icon(
+              noProfiles ? Icons.devices_rounded : Icons.search_off_rounded,
+              size: 42,
+              color: accent,
+            ),
           ),
-          child: Icon(
-            noProfiles ? Icons.devices_rounded : Icons.search_off_rounded,
-            size: 42,
-            color: accent,
-          ),
-        ),
-        const SizedBox(height: 22),
-        Text(
-          noProfiles ? 'Tu próxima conexión empieza aquí' : 'Sin coincidencias',
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: 10),
-        Text(
-          noProfiles
-              ? 'Trae tus perfiles de Remmina o añade tu primer equipo.'
-              : 'Prueba otro nombre, servidor o grupo.',
-          style: const TextStyle(color: Colors.grey, fontSize: 12),
-        ),
-        if (noProfiles) ...[
           const SizedBox(height: 22),
-          Wrap(
-            spacing: 12,
-            children: [
-              FilledButton.icon(
-                onPressed: importing ? null : () => _import(detected: true),
-                icon: const Icon(Icons.folder_open, size: 18),
-                label: const Text('Importar Remmina de este equipo'),
-              ),
-              TextButton(
-                onPressed: () => _edit(),
-                child: const Text('Crear un perfil'),
-              ),
-            ],
+          Text(
+            noProfiles ? 'Tu próxima conexión empieza aquí' : 'Sin coincidencias',
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
           ),
+          const SizedBox(height: 10),
+          Text(
+            noProfiles
+                ? 'Trae tus perfiles de Remmina o añade tu primer equipo.'
+                : 'Prueba otro nombre, servidor o grupo.',
+            style: const TextStyle(color: Colors.grey, fontSize: 12),
+          ),
+          if (noProfiles) ...[
+            const SizedBox(height: 22),
+            Wrap(
+              spacing: 12,
+              children: [
+                FilledButton.icon(
+                  onPressed: importing ? null : () => _import(detected: true),
+                  icon: const Icon(Icons.folder_open, size: 18),
+                  label: const Text('Importar Remmina de este equipo'),
+                ),
+                TextButton(
+                  onPressed: () => _edit(),
+                  child: const Text('Crear un perfil'),
+                ),
+              ],
+            ),
+          ],
         ],
-      ],
+      ),
     ),
   );
 
