@@ -49,8 +49,7 @@ class MemoryRepository extends ProfileRepository {
   Future<int> exportAll(
     List<RemminaProfile> profiles,
     Directory destination,
-  ) async =>
-      profiles.length;
+  ) async => profiles.length;
 
   @override
   Future<List<RemminaProfile>> importDirectory(Directory dir) async =>
@@ -134,60 +133,101 @@ void main() {
     },
   );
 
-  testWidgets('closing the app confirms and disposes session tabs', (
+  testWidgets('closing an empty library confirms and shares pending requests', (
     tester,
   ) async {
-    FlutterSecureStorage.setMockInitialValues({});
-    await repository.save(
-      RemminaProfile(
-        id: 'exit-test',
-        values: {
-          'name': 'Salida SSH',
-          'server': 'host.example.invalid',
-          'protocol': 'SSH',
-          'username': 'demo',
-          // Fail before network or filesystem work: this is a real session tab
-          // that lets the test exercise exit ownership without an SSH server.
-          'ssh_tunnel_enabled': '1',
-        },
-      ),
-    );
     await openLibrary(tester, const Size(1280, 800));
-    await tester.tap(find.byTooltip('Acciones de Salida SSH'));
-    await tester.pump(const Duration(milliseconds: 400));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Conectar'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(FilledButton, 'Conectar'));
-    await tester.pumpAndSettle();
-    await tester.pump(const Duration(milliseconds: 400));
-    expect(find.byType(SshSessionView), findsOneWidget);
-    expect(
-      find.textContaining('Este perfil requiere un túnel SSH.'),
-      findsOneWidget,
-    );
-
-    final canceled = tester.binding.handleRequestAppExit();
+    final first = tester.binding.handleRequestAppExit();
+    final repeated = tester.binding.handleRequestAppExit();
     await tester.pumpAndSettle();
     expect(find.text('Salir de Remina Desktop'), findsOneWidget);
+    expect(find.text('¿Quieres salir de Remina Desktop?'), findsOneWidget);
     await tester.tap(find.text('Cancelar'));
     await tester.pumpAndSettle();
-    expect(await canceled, AppExitResponse.cancel);
-    expect(find.byType(SshSessionView), findsOneWidget);
-    expect(
-      find.textContaining('Este perfil requiere un túnel SSH.'),
-      findsOneWidget,
-    );
+    expect(await first, AppExitResponse.cancel);
+    expect(await repeated, AppExitResponse.cancel);
 
     final exiting = tester.binding.handleRequestAppExit();
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Cerrar conexiones y salir'));
+    await tester.tap(find.widgetWithText(FilledButton, 'Salir'));
     await tester.pumpAndSettle();
     expect(await exiting, AppExitResponse.exit);
-    expect(find.byType(SshSessionView), findsNothing);
-    expect(find.text('1 perfiles · 0 pestañas de sesión'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  for (final closeTabFirst in [false, true]) {
+    testWidgets(
+      'closing the app after opening a session (closed: $closeTabFirst)',
+      (tester) async {
+        FlutterSecureStorage.setMockInitialValues({});
+        await repository.save(
+          RemminaProfile(
+            id: 'exit-test',
+            values: {
+              'name': 'Salida SSH',
+              'server': 'host.example.invalid',
+              'protocol': 'SSH',
+              'username': 'demo',
+              // Fail before network or filesystem work: this is a real session tab
+              // that lets the test exercise exit ownership without an SSH server.
+              'ssh_tunnel_enabled': '1',
+            },
+          ),
+        );
+        await openLibrary(tester, const Size(1280, 800));
+        await tester.tap(find.byTooltip('Acciones de Salida SSH'));
+        await tester.pump(const Duration(milliseconds: 400));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Conectar'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.widgetWithText(FilledButton, 'Conectar'));
+        await tester.pumpAndSettle();
+        await tester.pump(const Duration(milliseconds: 400));
+        expect(find.byType(SshSessionView), findsOneWidget);
+        expect(
+          find.textContaining('Este perfil requiere un túnel SSH.'),
+          findsOneWidget,
+        );
+
+        if (closeTabFirst) {
+          await tester.tap(find.byIcon(Icons.close));
+          await tester.pumpAndSettle();
+          await tester.tap(find.widgetWithText(FilledButton, 'Cerrar sesión'));
+          await tester.pumpAndSettle();
+          expect(find.byType(SshSessionView), findsNothing);
+        }
+
+        final canceled = tester.binding.handleRequestAppExit();
+        await tester.pumpAndSettle();
+        expect(find.text('Salir de Remina Desktop'), findsOneWidget);
+        await tester.tap(find.text('Cancelar'));
+        await tester.pumpAndSettle();
+        expect(await canceled, AppExitResponse.cancel);
+        expect(
+          find.byType(SshSessionView),
+          closeTabFirst ? findsNothing : findsOneWidget,
+        );
+        expect(
+          find.textContaining('Este perfil requiere un túnel SSH.'),
+          closeTabFirst ? findsNothing : findsOneWidget,
+        );
+
+        final exiting = tester.binding.handleRequestAppExit();
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.widgetWithText(
+            FilledButton,
+            closeTabFirst ? 'Salir' : 'Cerrar conexiones y salir',
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(await exiting, AppExitResponse.exit);
+        expect(find.byType(SshSessionView), findsNothing);
+        expect(find.text('1 perfiles · 0 pestañas de sesión'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
 
   testWidgets('opens about and license dialog', (tester) async {
     await openLibrary(tester, const Size(1280, 800));

@@ -2,6 +2,12 @@ import Cocoa
 import FlutterMacOS
 
 class MainFlutterWindow: NSWindow {
+  override func performClose(_ sender: Any?) {
+    // Keep the window visible while Flutter confirms exit and disposes sessions.
+    // Closing it first leaves a canceled termination with no visible dialog.
+    NSApp.terminate(sender)
+  }
+
   override func awakeFromNib() {
     let flutterViewController = FlutterViewController()
     let windowFrame = self.frame

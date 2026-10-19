@@ -144,17 +144,15 @@ class _ConnectionLibraryState extends State<ConnectionLibrary>
       _confirmAppExit().whenComplete(() => _exitRequest = null);
 
   Future<AppExitResponse> _confirmAppExit() async {
-    if (!mounted) return AppExitResponse.exit;
-    if (sessions.isEmpty) {
-      _exiting = true;
-      return AppExitResponse.exit;
-    }
+    if (!mounted || _exiting) return AppExitResponse.exit;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Salir de Remina Desktop'),
         content: Text(
-          'Se cerrarán las ${sessions.length} pestañas de sesión y sus conexiones remotas.',
+          sessions.isEmpty
+              ? '¿Quieres salir de Remina Desktop?'
+              : 'Se cerrarán las ${sessions.length} pestañas de sesión y sus conexiones remotas.',
         ),
         actions: [
           TextButton(
@@ -163,7 +161,7 @@ class _ConnectionLibraryState extends State<ConnectionLibrary>
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Cerrar conexiones y salir'),
+            child: Text(sessions.isEmpty ? 'Salir' : 'Cerrar conexiones y salir'),
           ),
         ],
       ),
