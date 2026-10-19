@@ -48,6 +48,12 @@ class PackagingTests(unittest.TestCase):
             manifest = json.loads((root / 'manifest.json').read_text())
             self.assertEqual(manifest['files'], [{'path': 'library', 'sha256': bundle.digest(root / 'library')}])
 
+    def test_available_source_resolves_explicit_path(self):
+        with tempfile.TemporaryDirectory() as directory:
+            engine = Path(directory) / 'sdl-freerdp'
+            engine.write_bytes(b'fixture')
+            self.assertEqual(bundle.available_source(str(engine), 'macos'), engine.resolve())
+
 
 if __name__ == '__main__':
     unittest.main()

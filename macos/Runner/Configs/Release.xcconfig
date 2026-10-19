@@ -2,4 +2,5 @@
 #include "Warnings.xcconfig"
 
 // Build a distribution for this builder architecture, matching the bundled engine.
-ARCHS = $(NATIVE_ARCH_ACTUAL)
+// NATIVE_ARCH_ACTUAL can select arm64e, which Flutter does not ship.
+ARCHS = $(NATIVE_ARCH_64_BIT)

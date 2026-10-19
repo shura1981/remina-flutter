@@ -46,6 +46,19 @@ Salida: `dist/Remina-Desktop-linux-<arquitectura>.tar.xz`, con permisos de ejecu
 
 Requiere Xcode, Python 3, FVM y una entrada FreeRDP 3 en el equipo de compilación. El script puede preparar esa entrada con Homebrew; también puedes proporcionar `REMINA_FREERDP_SOURCE` de una compilación propia.
 
+Para ejecutar en desarrollo, instala primero el motor (también se incluye en las compilaciones debug):
+
+```bash
+brew install freerdp
+fvm install
+fvm flutter pub get
+fvm flutter run -d macos
+```
+
+El empaquetador busca `sdl-freerdp` o `sdl-freerdp3`. Si usas una compilación propia, ejecuta `REMINA_FREERDP_SOURCE=/ruta/a/sdl-freerdp fvm flutter run -d macos`.
+
+Para generar el ZIP de producción:
+
 ```bash
 dart pub global activate fvm
 tools/build_macos.sh

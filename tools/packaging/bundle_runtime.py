@@ -80,10 +80,18 @@ def available_source(explicit, system):
         found = shutil.which(name)
         if found:
             return Path(found).resolve()
+    if system == 'macos':
+        for prefix in [Path('/opt/homebrew/bin'), Path('/usr/local/bin'), Path.home() / '.local/share/remina/engines/freerdp/bin']:
+            for name in names:
+                candidate = prefix / name
+                if candidate.is_file():
+                    return candidate.resolve()
     if system == 'linux':
         local = Path.home() / '.local/share/remina/engines/freerdp/bin/xfreerdp'
         if local.is_file():
             return local
+    if system == 'macos':
+        raise RuntimeError('Build requires FreeRDP 3 on the build machine, including debug builds. Run `brew install freerdp`, then retry `fvm flutter run -d macos`; or set REMINA_FREERDP_SOURCE to your sdl-freerdp executable. The finished application will include it.')
     raise RuntimeError('Build requires FreeRDP 3 as an INPUT. Set REMINA_FREERDP_SOURCE or install it on the build machine. The finished application will include it.')
 
 
