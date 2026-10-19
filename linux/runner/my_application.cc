@@ -25,62 +25,13 @@ static void my_application_activate(GApplication* application) {
   GtkWindow* window =
       GTK_WINDOW(gtk_application_window_new(GTK_APPLICATION(application)));
 
-  // Use a header bar when running in GNOME as this is the common style used
-  // by applications and is the setup most users will be using (e.g. Ubuntu
-  // desktop).
-  // If running on X and not using GNOME then just use a traditional title bar
-  // in case the window manager does more exotic layout, e.g. tiling.
-  // If running on Wayland assume the header bar will work (may need changing
-  // if future cases occur).
-  gboolean use_header_bar = TRUE;
-#ifdef GDK_WINDOWING_X11
-  GdkScreen* screen = gtk_window_get_screen(window);
-  if (GDK_IS_X11_SCREEN(screen)) {
-    const gchar* wm_name = gdk_x11_screen_get_window_manager_name(screen);
-    if (g_strcmp0(wm_name, "GNOME Shell") != 0) {
-      use_header_bar = FALSE;
-    }
-  }
-#endif
   GtkSettings* gtk_settings = gtk_settings_get_default();
   if (gtk_settings != nullptr) {
     g_object_set(gtk_settings, "gtk-application-prefer-dark-theme", TRUE, nullptr);
   }
 
-  GtkCssProvider* provider = gtk_css_provider_new();
-  gtk_css_provider_load_from_data(
-      provider,
-      "headerbar {"
-      "  background: #14151c;"
-      "  background-color: #14151c;"
-      "  color: #f0f0f0;"
-      "  border-bottom: 1px solid rgba(255, 255, 255, 0.08);"
-      "  box-shadow: none;"
-      "}"
-      "headerbar .title {"
-      "  color: #e0e0e0;"
-      "  font-weight: 500;"
-      "  font-size: 13px;"
-      "}"
-      "headerbar button.titlebutton, headerbar windowcontrols button {"
-      "  color: #e0e0e0;"
-      "}",
-      -1, nullptr);
-  gtk_style_context_add_provider_for_screen(
-      gdk_screen_get_default(),
-      GTK_STYLE_PROVIDER(provider),
-      GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
-  g_object_unref(provider);
+  gtk_window_set_title(window, "Remina");
 
-  if (use_header_bar) {
-    GtkHeaderBar* header_bar = GTK_HEADER_BAR(gtk_header_bar_new());
-    gtk_widget_show(GTK_WIDGET(header_bar));
-    gtk_header_bar_set_title(header_bar, "Remina");
-    gtk_header_bar_set_show_close_button(header_bar, TRUE);
-    gtk_window_set_titlebar(window, GTK_WIDGET(header_bar));
-  } else {
-    gtk_window_set_title(window, "Remina");
-  }
 
 
   gtk_window_set_default_size(window, 1280, 800);
