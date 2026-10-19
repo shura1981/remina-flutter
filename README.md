@@ -191,3 +191,8 @@ Este repositorio es el resultado de un proceso de **reingeniería inversa y aná
 La investigación técnica original se realizó sobre Remmina 1.4.43 y su plugin RDP mediante herramientas de análisis estático (REA MCP + Hopper). Los hallazgos, procedimientos y mapeos de configuración se encuentran detallados en el [Informe técnico](docs/reverse-engineering/REPORT.md) y el [índice de evidencias](docs/reverse-engineering/evidence.json).
 
 Referencias primarias: [FreeRDP](https://github.com/FreeRDP/FreeRDP), [configuración Remmina](https://remmina.gitlab.io/remminadoc.gitlab.io/md__builds__remmina_remmina_ci__remmina_wiki__remmina__config__file__options.html), [ubicación de código en bundles macOS](https://developer.apple.com/documentation/bundleresources/placing-content-in-a-bundle), [firma de código anidado](https://developer.apple.com/library/archive/technotes/tn2206/). Las licencias de las bibliotecas incluidas se conservan íntegramente en el paquete.
+
+### Licencia del proyecto
+El código original de Remina Desktop se distribuye bajo la **[Licencia MIT](LICENSE)**. Las bibliotecas, fuentes y motores empaquetados o enlazados (FreeRDP, Flutter, GTK, SQLite, OpenSSL) conservan sus respectivas licencias originales (Apache 2.0, BSD, LGPL/GPL, MIT).
+
+La aplicación incluye dentro de la barra lateral la opción **Acerca de y Licencias**, donde se puede consultar la versión activa, el marco legal y el desglose interactivo de todas las licencias de dependencias (`showLicensePage`).

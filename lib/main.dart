@@ -684,6 +684,127 @@ class _ConnectionLibraryState extends State<ConnectionLibrary>
     );
   }
 
+  Future<void> _showAbout() async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        actionsPadding: const EdgeInsets.all(16),
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/branding/remina-mark-128.png',
+              width: 44,
+              height: 44,
+              filterQuality: FilterQuality.high,
+            ),
+            const SizedBox(width: 14),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Remina Desktop',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    'Versión 1.0.0+1 · Multiplataforma',
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        content: SizedBox(
+          width: 480,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Divider(height: 20),
+              const Text(
+                'Cliente de escritorio remoto multiplataforma compatible con perfiles .remmina (Linux, macOS y Windows).',
+                style: TextStyle(fontSize: 13, height: 1.4),
+              ),
+              const SizedBox(height: 14),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? const Color(0xff22232f)
+                      : const Color(0xfff0f1f5),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Licencia del Proyecto: Código Abierto (MIT)',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Reimplementación limpia e independiente (Clean-Room / REA). '
+                      'Desarrollado estrictamente para fines personales, educativos y de interoperabilidad. '
+                      'No comercial.',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey,
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'Remmina es un proyecto de software libre bajo licencia GPL. '
+                'Remina Desktop es un cliente independiente no oficial.',
+                style: TextStyle(fontSize: 11, color: Colors.grey),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          OutlinedButton.icon(
+            icon: const Icon(Icons.article_outlined, size: 16),
+            label: const Text('Ver licencias de terceros'),
+            onPressed: () {
+              showLicensePage(
+                context: context,
+                applicationName: 'Remina Desktop',
+                applicationVersion: '1.0.0+1',
+                applicationIcon: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Image.asset(
+                    'assets/branding/remina-mark-128.png',
+                    width: 48,
+                    height: 48,
+                  ),
+                ),
+                applicationLegalese:
+                    '© 2026 dev.steven. Proyecto abierto sin fines comerciales.',
+              );
+            },
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cerrar'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
@@ -844,14 +965,27 @@ class _ConnectionLibraryState extends State<ConnectionLibrary>
                           title: const Text('Preferencias'),
                           onTap: _preferences,
                         ),
-                        const Padding(
-                          padding: EdgeInsets.all(24),
-                          child: Text(
-                            'PERSONAL EDITION  /  1.0',
-                            style: TextStyle(
-                              fontSize: 9,
-                              letterSpacing: 1.2,
-                              color: Colors.grey,
+                        ListTile(
+                          dense: true,
+                          leading: const Icon(
+                            Icons.info_outline_rounded,
+                            size: 20,
+                          ),
+                          title: const Text('Acerca de y Licencias'),
+                          onTap: _showAbout,
+                        ),
+                        InkWell(
+                          onTap: _showAbout,
+                          borderRadius: BorderRadius.circular(6),
+                          child: const Padding(
+                            padding: EdgeInsets.fromLTRB(24, 16, 24, 20),
+                            child: Text(
+                              'PERSONAL EDITION  /  v1.0.0',
+                              style: TextStyle(
+                                fontSize: 9,
+                                letterSpacing: 1.2,
+                                color: Colors.grey,
+                              ),
                             ),
                           ),
                         ),

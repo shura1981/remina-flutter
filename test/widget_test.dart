@@ -177,4 +177,16 @@ void main() {
     expect(find.text('1 perfiles · 0 pestañas de sesión'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('opens about and license dialog', (tester) async {
+    await openLibrary(tester, const Size(1280, 800));
+    await tester.tap(find.text('Acerca de y Licencias'));
+    await tester.pumpAndSettle();
+    expect(find.text('Versión 1.0.0+1 · Multiplataforma'), findsOneWidget);
+    expect(find.textContaining('Licencia del Proyecto'), findsOneWidget);
+    expect(find.text('Ver licencias de terceros'), findsOneWidget);
+    await tester.tap(find.text('Cerrar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Versión 1.0.0+1 · Multiplataforma'), findsNothing);
+  });
 }
