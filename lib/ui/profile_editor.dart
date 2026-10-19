@@ -49,7 +49,11 @@ class _ProfileEditorState extends State<_ProfileEditor> {
         ? true
         : ((widget.profile?.flag('cert_ignore') ?? false) ||
             (widget.profile?.flag('ignore-tls-errors') ?? false));
-    _dynamicResolution = widget.profile == null ? true : _value('scale') == '2';
+    _dynamicResolution = widget.profile == null
+        ? true
+        : (widget.profile!.values.containsKey('scale')
+            ? _value('scale') == '2'
+            : true);
 
     for (final key in [
       'name',

@@ -688,9 +688,16 @@ class _ConnectionLibraryState extends State<ConnectionLibrary>
         /* Noncritical history. */
       }
     }
-    final sessionProfile = p.copyWith(
-      values: {...p.values, 'username': result.username},
-    );
+    final effectiveValues = <String, String>{
+      ...p.values,
+      'username': result.username,
+    };
+    if (p.protocol == 'RDP' &&
+        !p.values.containsKey('scale') &&
+        p.get('resolution_mode') != '0') {
+      effectiveValues['scale'] = '2';
+    }
+    final sessionProfile = p.copyWith(values: effectiveValues);
     final key = UniqueKey();
     final view = p.protocol == 'SSH'
         ? SshSessionView(
