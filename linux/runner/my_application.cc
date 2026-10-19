@@ -30,7 +30,8 @@ static void my_application_activate(GApplication* application) {
     g_object_set(gtk_settings, "gtk-application-prefer-dark-theme", TRUE, nullptr);
   }
 
-  gtk_window_set_title(window, "Remina");
+  gtk_window_set_title(window, "Remina Desktop");
+
 
 
 

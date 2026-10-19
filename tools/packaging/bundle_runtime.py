@@ -271,7 +271,11 @@ def macos_bundle(root, source, sign):
         raise RuntimeError('Only FreeRDP 3 is supported')
     # Standard Apple code locations; never put Mach-O code in Resources.
     executable = root / 'Contents/MacOS/remina-rdp'
-    main_binary = root / 'Contents/MacOS/Remina'
+    main_binary = root / 'Contents/MacOS' / root.stem
+    if not main_binary.is_file():
+        main_binary = root / 'Contents/MacOS/Remina Desktop'
+    if not main_binary.is_file():
+        main_binary = root / 'Contents/MacOS/Remina'
     if main_binary.is_file():
         required_arches = set(run(['lipo', '-archs', main_binary]).split())
         engine_arches = set(run(['lipo', '-archs', source]).split())

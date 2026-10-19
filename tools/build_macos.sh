@@ -17,9 +17,10 @@ fvm flutter analyze
 fvm flutter test
 python3 -m unittest discover -s tools/packaging/tests
 fvm flutter build macos --release
-codesign --verify --deep --strict build/macos/Build/Products/Release/Remina.app
-build/macos/Build/Products/Release/Remina.app/Contents/MacOS/remina-rdp /version
+app_bundle="$(ls -d build/macos/Build/Products/Release/*.app | head -n 1)"
+codesign --verify --deep --strict "$app_bundle"
+"$app_bundle/Contents/MacOS/remina-rdp" /version
 mkdir -p dist
-ditto -c -k --sequesterRsrc --keepParent build/macos/Build/Products/Release/Remina.app dist/Remina-macos.zip
-echo 'Paquete completo: dist/Remina-macos.zip'
+ditto -c -k --sequesterRsrc --keepParent "$app_bundle" dist/Remina-Desktop-macos.zip
+echo 'Paquete completo: dist/Remina-Desktop-macos.zip'
 echo 'El paquete incluye el motor RDP y sus dylibs; el equipo de destino no necesita Homebrew.' 

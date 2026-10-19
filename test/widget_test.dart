@@ -158,7 +158,7 @@ void main() {
 
     final canceled = tester.binding.handleRequestAppExit();
     await tester.pumpAndSettle();
-    expect(find.text('Salir de Remina'), findsOneWidget);
+    expect(find.text('Salir de Remina Desktop'), findsOneWidget);
     await tester.tap(find.text('Cancelar'));
     await tester.pumpAndSettle();
     expect(await canceled, AppExitResponse.cancel);

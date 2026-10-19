@@ -22,7 +22,7 @@ void main() {
     test(
       'missing bundle asks for a complete app, never a separate install',
       () {
-        for (final system in ['linux', 'macos']) {
+        for (final system in ['linux', 'macos', 'windows']) {
           final help = RdpBackend.installationHelp(operatingSystem: system);
           expect(help, contains('paquete completo'));
           expect(help, isNot(contains('brew')));
@@ -64,10 +64,25 @@ void main() {
             isNull,
           );
         }
+
+        final winApp = '${temporary.path}/windows/remina.exe';
+        final winPath = '${temporary.path}/windows/remina-rdp.exe';
+        final winFile = File(winPath);
+        await winFile.parent.create(recursive: true);
+        await winFile.writeAsString('test-binary');
+        expect(
+          await RdpBackend.findExecutable(
+            appExecutablePath: winApp,
+            operatingSystem: 'windows',
+            environment: {'HOME': '/nonexistent', 'PATH': ''},
+          ),
+          winPath,
+        );
       } finally {
         await temporary.delete(recursive: true);
       }
     }, skip: !Platform.isLinux && !Platform.isMacOS);
+
 
     test(
       'never falls back to a host engine when the bundle is incomplete',

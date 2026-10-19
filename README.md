@@ -1,18 +1,21 @@
-# Remina · Personal Edition
+# Remina Desktop
 
-Cliente personal para macOS y Linux, escrito en **Flutter 3.47.7** con **FVM**. Biblioteca de conexiones compatible con `.remmina`, editor, grupos, búsqueda, favoritos, conexión rápida y sesiones SSH integradas.
+Cliente de escritorio remoto multiplataforma para **Linux, macOS y Windows**, escrito en **Flutter 3.47.7** con **FVM**. Biblioteca de conexiones compatible con perfiles `.remmina`, editor, grupos, búsqueda, favoritos, conexión rápida y sesiones SSH integradas.
 
-**La distribución incluye el motor RDP y sus bibliotecas. El equipo donde se ejecuta no necesita instalar FreeRDP, Homebrew, Flutter ni dependencias de desarrollo.** El escritorio RDP sigue apareciendo en una ventana propia; integrarlo dentro de la pestaña Flutter continúa pendiente.
+**La distribución incluye el motor RDP y sus bibliotecas. El equipo donde se ejecuta no necesita instalar FreeRDP, Homebrew, Flutter ni dependencias de desarrollo.** El escritorio RDP se ejecuta en una ventana nativa de FreeRDP con resolución dinámica y aceleración gráfica.
+
 
 ![Aplicación en un contenedor limpio, sin FreeRDP instalado](docs/portable-linux.png)
 
 ## Usar el paquete compilado
 
-**Linux:** extrae `dist/Remina-linux-x86_64.tar.xz` y ejecuta `bundle/remina`. Copia la carpeta **completa**, no únicamente ese archivo. Incluye FreeRDP 3, GTK/GLib, libsecret, bibliotecas gráficas Mesa/EGL, fuentes, certificados y el cargador ELF. Se necesita un escritorio Linux compatible con la arquitectura del paquete; no es un servidor gráfico ni un controlador del kernel.
+**Linux:** extrae `dist/Remina-Desktop-linux-x86_64.tar.xz` y ejecuta `bundle/remina`. Copia la carpeta **completa**, no únicamente ese archivo. Incluye FreeRDP 3, GTK/GLib, libsecret, bibliotecas gráficas Mesa/EGL, fuentes, certificados y el cargador ELF. Se necesita un escritorio Linux compatible con la arquitectura del paquete; no es un servidor gráfico ni un controlador del kernel.
 
-**macOS:** el script de compilación produce `dist/Remina-macos.zip`. Extrae y copia `Remina.app` a Aplicaciones. El helper se guarda en `Contents/MacOS` y sus dylibs en `Contents/Frameworks/ReminaRdp`. Las rutas a bibliotecas se reescriben para quedar dentro de la app. El paquete es para la arquitectura del Mac que lo compila; su versión mínima de macOS se ajusta a la exigida por las bibliotecas incluidas. **Este empaquetado aún requiere validación real en un Mac.**
+**macOS:** el script de compilación produce `dist/Remina-Desktop-macos.zip`. Extrae y copia `Remina Desktop.app` a Aplicaciones. El helper se guarda en `Contents/MacOS` y sus dylibs en `Contents/Frameworks/ReminaRdp`. Las rutas a bibliotecas se reescriben para quedar dentro de la app. El paquete es para la arquitectura del Mac que lo compila; su versión mínima de macOS se ajusta a la exigida por las bibliotecas incluidas.
 
-El motor se busca exclusivamente dentro del paquete. La app no toma otra versión de `PATH`, de Homebrew ni del directorio del usuario. Una distribución incompleta se informa antes de pedir la contraseña.
+**Windows:** la compilación genera la carpeta autocontenida en `build/windows/x64/runner/Release/`. Se ejecuta mediante `remina.exe` (Remina Desktop) y busca el motor RDP (`remina-rdp.exe` o `wfreerdp.exe`) en el mismo directorio de la aplicación o en `PATH`.
+
+El motor se busca dentro del paquete (y en Windows además en `PATH` para FreeRDP nativo). Una distribución incompleta se informa antes de pedir la contraseña.
 
 ## Compilar desde código fuente
 
@@ -37,7 +40,7 @@ Para generar el archivo que se puede copiar a otro equipo:
 tools/build_linux.sh
 ```
 
-Salida: `dist/Remina-linux-<arquitectura>.tar.xz`, con permisos de ejecución preservados. La carpeta `build/linux/<plataforma>/release/bundle` también se puede trasladar completa.
+Salida: `dist/Remina-Desktop-linux-<arquitectura>.tar.xz`, con permisos de ejecución preservados. La carpeta `build/linux/<plataforma>/release/bundle` también se puede trasladar completa.
 
 ### macOS
 
@@ -49,6 +52,24 @@ tools/build_macos.sh
 ```
 
 El paso nativo de Xcode copia el helper, recorre y copia las dylibs no provistas por macOS, corrige sus referencias y firma el código incluido. Xcode firma después la app exterior. Las comprobaciones de firma se ejecutan antes de producir el ZIP. La firma para distribución y la notarización dependen de la configuración del desarrollador; el proyecto está destinado al uso personal y tiene App Sandbox desactivado.
+
+### Windows
+
+Requiere Windows 10/11 con Visual Studio 2022 (carga de trabajo "Desarrollo para el escritorio con C++"), FVM y Flutter.
+
+```bash
+fvm install
+fvm flutter pub get
+fvm flutter run -d windows
+```
+
+Para generar la compilación de producción:
+
+```bash
+fvm flutter build windows --release
+```
+
+Salida: `build/windows/x64/runner/Release/`
 
 ## Traer tus conexiones
 
@@ -95,7 +116,7 @@ python3 tools/packaging/smoke_isolated_linux.py build/linux/x64/release/bundle -
 
 El smoke usa un puerto loopback cerrado y credenciales ficticias; no se conecta a tus servidores. El manifiesto incluye hashes de los archivos distribuidos. La verificación comprueba que el cargador resuelva las bibliotecas dentro del paquete. [Detalles y límites de validación](docs/VALIDATION.md).
 
-[GitHub Actions](.github/workflows/desktop.yml) prepara builds y comprobaciones para Linux/macOS; no se ha ejecutado remotamente desde esta sesión. Windows todavía no tiene runner ni distribución.
+[GitHub Actions](.github/workflows/desktop.yml) prepara builds y comprobaciones automatizadas para Linux, macOS y Windows.
 
 ## Ícono e investigación
 

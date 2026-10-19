@@ -36,7 +36,7 @@ class _ReminaAppState extends State<ReminaApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Remina',
+      title: 'Remina Desktop',
       debugShowCheckedModeBanner: false,
       themeMode: dark ? ThemeMode.dark : ThemeMode.light,
       theme: _theme(Brightness.light),
@@ -152,7 +152,7 @@ class _ConnectionLibraryState extends State<ConnectionLibrary>
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Salir de Remina'),
+        title: const Text('Salir de Remina Desktop'),
         content: Text(
           'Se cerrarán las ${sessions.length} pestañas de sesión y sus conexiones remotas.',
         ),
@@ -744,15 +744,16 @@ class _ConnectionLibraryState extends State<ConnectionLibrary>
                                     const SizedBox(width: 8),
                                     const Flexible(
                                       child: Text(
-                                        'remina',
+                                        'Remina Desktop',
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
-                                          fontSize: 25,
+                                          fontSize: 18,
                                           fontWeight: FontWeight.w700,
-                                          letterSpacing: -.8,
+                                          letterSpacing: -.5,
                                         ),
                                       ),
                                     ),
+
                                   ],
                                 ),
                               ),

@@ -1,5 +1,6 @@
 name: remina
-description: "Cliente remoto personal compatible con perfiles Remmina."
+description: "Remina Desktop: cliente de escritorio remoto multiplataforma (Linux, macOS y Windows) compatible con perfiles Remmina."
+
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev

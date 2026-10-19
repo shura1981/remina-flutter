@@ -31,3 +31,18 @@ jobs:
         with:
           name: Remina-macos
           path: dist/Remina-macos.zip
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+      - run: dart pub global activate fvm
+      - run: fvm install
+      - run: fvm flutter pub get
+      - run: fvm flutter test
+      - run: fvm flutter build windows --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Remina-windows
+          path: build/windows/x64/runner/Release/*
+

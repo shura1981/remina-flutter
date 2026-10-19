@@ -8,11 +8,12 @@ import '../models/remmina_profile.dart';
 /// Credentials travel through stdin, never through the process argument list.
 class RdpBackend {
   static String installationHelp({String? operatingSystem}) {
-    return 'Esta copia de Remina está incompleta: falta el motor RDP incluido '
+    return 'Esta copia de Remina Desktop está incompleta: falta el motor RDP incluido '
         'en la aplicación. Vuelve a generar o descargar el paquete completo '
         'para ${operatingSystem ?? Platform.operatingSystem}. '
         'La contraseña todavía no se ha enviado al servidor.';
   }
+
 
   static List<String> arguments(RemminaProfile profile) {
     if (profile.server.trim().isEmpty || profile.username.trim().isEmpty) {
@@ -131,16 +132,22 @@ class RdpBackend {
       if (preferred != null && preferred.isNotEmpty) preferred,
       if (system == 'macos') '$appDirectory/remina-rdp',
       if (system == 'linux') '$bundledRoot/rdp/bin/remina-rdp',
+      if (system == 'windows') '$appDirectory/remina-rdp.exe',
+      if (system == 'windows') '$appDirectory/wfreerdp.exe',
+      if (system == 'windows') '$bundledRoot/rdp/bin/remina-rdp.exe',
+      if (system == 'windows') '$bundledRoot/rdp/bin/wfreerdp.exe',
     ];
     for (final candidate in candidates) {
       final file = File(candidate);
       if (await file.exists()) {
+        if (system == 'windows') return candidate;
         final stat = await file.stat();
         if (stat.mode & 0x49 != 0) return candidate;
       }
     }
     return null;
   }
+
 
   static Future<Process> start({
     required RemminaProfile profile,
