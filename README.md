@@ -98,30 +98,96 @@ Los perfiles con túneles o comandos proxy/hooks no implementados se rechazan. `
 
 La contraseña RDP se pasa por stdin, fuera de los argumentos del proceso. El estado de la pestaña indica si el helper está activo; la autenticación se muestra en su ventana. Cerrar una pestaña desconecta; la salida normal de la app solicita confirmación cuando hay sesiones.
 
-## Verificación del empaquetado
+## Guía de herramientas y scripts (`tools/`)
 
-```bash
-fvm flutter analyze
-fvm flutter test
-python3 -m unittest discover -s tools/packaging/tests
-python3 tools/packaging/verify_linux_bundle.py build/linux/x64/release/bundle
-python3 tools/packaging/verify_linux_bundle.py build/linux/x64/release/bundle --container alpine:latest
-```
+El directorio `tools/` contiene utilidades especializadas para la preparación de dependencias, compilación multiplataforma, empaquetado hermético y pruebas de humo:
 
-Para probar también interfaz y arranque RDP en un contenedor limpio (Docker y Xvfb solo en el equipo de pruebas):
+### 1. Entorno de desarrollo y dependencias
+- **`tools/setup_linux.sh`**
+  - **Propósito:** Prepara e instala las herramientas nativas de compilación en Linux (Ubuntu/Debian) necesarias para Flutter de escritorio (`clang`, `cmake`, `ninja`, `pkg-config`, `libgtk-3-dev`, `libsecret-1-dev`, fuentes DejaVu).
+  - **Uso:**
+    ```bash
+    tools/setup_linux.sh          # Instala dependencias faltantes con apt
+    tools/setup_linux.sh --check  # Solo verifica dependencias (código 0 si todo está listo)
+    ```
+- **`tools/setup_rdp_linux.sh`**
+  - **Propósito:** Descarga y extrae localmente un binario de FreeRDP 3 sin requerir privilegios de superusuario (`sudo`), preparándolo en `~/.local/share/remina/engines/freerdp/bin/xfreerdp` como entrada de compilación para CMake.
+  - **Uso:**
+    ```bash
+    tools/setup_rdp_linux.sh
+    ```
 
-```bash
-python3 tools/packaging/smoke_isolated_linux.py build/linux/x64/release/bundle --image alpine:latest
-```
+### 2. Compilación y empaquetado de producción
+- **`tools/build_linux.sh`**
+  - **Propósito:** Automatiza el pipeline de producción en Linux: analiza el código, ejecuta los tests unitarios, compila el bundle release con Flutter, valida la integridad del paquete y comprime el archivo distribuible `dist/Remina-Desktop-linux-<arch>.tar.xz`.
+  - **Uso:**
+    ```bash
+    tools/build_linux.sh
+    ```
+- **`tools/build_macos.sh`**
+  - **Propósito:** Automatiza el pipeline de producción en macOS: compila la app release, valida y reescribe las dylibs de FreeRDP 3 incluidas, verifica la firma con `codesign` y genera el archivo `dist/Remina-Desktop-macos.zip`.
+  - **Uso:**
+    ```bash
+    tools/build_macos.sh
+    ```
+- **`tools/packaging/bundle_runtime.py`**
+  - **Propósito:** Motor de empaquetado hermético invocado por CMake/Xcode. Resuelve el árbol de dependencias binarias (ELF en Linux, Mach-O/dylibs en macOS), copia bibliotecas del sistema requeridas a la carpeta de la app, reescribe `rpath` y rutas dinámicas (`@loader_path`), e incrusta el archivo `runtime-manifest.json` con los hashes SHA256 de cada archivo distribuido.
+  - **Uso:** Invocado internamente durante `flutter build` o manualmente:
+    ```bash
+    python3 tools/packaging/bundle_runtime.py --platform linux --root build/linux/x64/release/bundle
+    ```
 
-El smoke usa un puerto loopback cerrado y credenciales ficticias; no se conecta a tus servidores. El manifiesto incluye hashes de los archivos distribuidos. La verificación comprueba que el cargador resuelva las bibliotecas dentro del paquete. [Detalles y límites de validación](docs/VALIDATION.md).
+### 3. Branding y exportación de íconos
+- **`tools/export_icons.sh`**
+  - **Propósito:** Exporta todos los recursos visuales e íconos de la aplicación a partir del master `assets/branding/remina-macos.png` usando ImageMagick. Produce las marcas para la UI (64, 128, 256 px), el catálogo nativo de macOS (`AppIcon.appiconset` de 16 a 1024 px) y el archivo de íconos multi-resolución para Windows (`windows/runner/resources/app_icon.ico`).
+  - **Uso:**
+    ```bash
+    tools/export_icons.sh
+    ```
 
-[GitHub Actions](.github/workflows/desktop.yml) prepara builds y comprobaciones automatizadas para Linux, macOS y Windows.
+### 4. Pruebas de humo, validación y verificación
+- **`tools/rdp_smoke.dart`**
+  - **Propósito:** Prueba de arranque seguro del motor RDP en Dart. Instancia un perfil RDP contra un puerto loopback efímero cerrado (127.0.0.1) para comprobar que FreeRDP recibe argumentos válidos y lee la contraseña vía stdin, verificando que rechace conexiones de forma controlada sin comunicarse con servidores reales.
+  - **Uso:**
+    ```bash
+    fvm dart run tools/rdp_smoke.dart [ruta-al-binario-rdp]
+    ```
+- **`tools/packaging/verify_linux_bundle.py`**
+  - **Propósito:** Valida que una distribución de Linux esté íntegra: comprueba los hashes SHA256 contra el manifiesto y analiza con el cargador ELF que ninguna biblioteca externa del host sea enlazada inadvertidamente. Soporta además validación en un contenedor Docker aislado.
+  - **Uso:**
+    ```bash
+    python3 tools/packaging/verify_linux_bundle.py build/linux/x64/release/bundle
+    python3 tools/packaging/verify_linux_bundle.py build/linux/x64/release/bundle --container alpine:latest
+    ```
+- **`tools/packaging/smoke_isolated_linux.py`**
+  - **Propósito:** Prueba de humo GUI en entorno aislado. Arranca un servidor virtual Xvfb y ejecuta la aplicación completa dentro de un contenedor Docker limpio (Ubuntu/Alpine sin red), verificando que la ventana Flutter se mapee y renderice sin errores de OpenGL ni dependencias faltantes.
+  - **Uso:**
+    ```bash
+    python3 tools/packaging/smoke_isolated_linux.py build/linux/x64/release/bundle --image ubuntu:24.04
+    ```
+- **`tools/packaging/tests/test_packaging.py`**
+  - **Propósito:** Suite de pruebas unitarias (`unittest`) de Python para verificar la lógica de empaquetado hermético de `bundle_runtime.py` (detección de colisiones de bibliotecas, resolución de rpaths y comprobación de dependencias dinámicas).
+  - **Uso:**
+    ```bash
+    python3 -m unittest discover -s tools/packaging/tests
+    ```
 
-## Ícono e investigación
+[GitHub Actions](.github/workflows/desktop.yml) ejecuta builds y comprobaciones automatizadas para Linux, macOS y Windows en cada push y pull request.
 
-El ícono combina la identidad de Remmina con un rostro inspirado en Finder. [Assets, master y prompts](assets/branding/README.md).
+## Investigación, Reingeniería Limpia (REA) y Aviso Legal
 
-La investigación original se hizo sobre Remmina 1.4.43 y su plugin RDP mediante REA MCP + Hopper. [Informe](docs/reverse-engineering/REPORT.md) e [índice de evidencias](docs/reverse-engineering/evidence.json). El código Flutter es una implementación nueva. El análisis estático no equivale a observar todas las funciones en ejecución.
+Este repositorio es el resultado de un proceso de **reingeniería inversa y análisis de interoperabilidad (REA - Reverse Engineering Analysis)** sobre artefactos públicos y bibliotecas abiertas (Remmina 1.4.43 y FreeRDP 3), con el fin de crear un cliente multiplataforma moderno e independiente.
 
-Referencias primarias: [FreeRDP](https://github.com/FreeRDP/FreeRDP), [configuración Remmina](https://remmina.gitlab.io/remminadoc.gitlab.io/md__builds__remmina_remmina_ci__remmina_wiki__remmina__config__file__options.html), [ubicación del código dentro de una app de Apple](https://developer.apple.com/documentation/bundleresources/placing-content-in-a-bundle), [firma de código anidado](https://developer.apple.com/library/archive/technotes/tn2206/). Las licencias de las bibliotecas incluidas se conservan en el paquete.
+> [!IMPORTANT]
+> **Fines no comerciales:** Este proyecto se desarrolla y comparte estrictamente con fines **educativos, de investigación técnica, interoperabilidad y uso personal**. No persigue ningún fin de lucro ni explotación comercial.
+
+### Principios de legalidad y diseño en sala limpia (*Clean-Room*)
+- **Reimplementación independiente:** Todo el código en Flutter/Dart es una implementación original y nueva. No se copió ni incluyó código fuente original ni pseudocódigo descompilado del proyecto Remmina.
+- **Interoperabilidad legítima:** La compatibilidad con el formato de perfiles `.remmina` (formato de texto plano basado en especificaciones GLib KeyFile) y la integración con FreeRDP y SSH se basan en estándares abiertos y documentación pública con el único propósito de interoperar con configuraciones y servidores existentes.
+- **Seguridad y privacidad:** No se almacenan contraseñas en texto claro, no se vulneran esquemas de cifrado del sistema y las credenciales viajan exclusivamente a través de flujos estándar y seguros (llavero nativo del SO y stdin del proceso motor).
+- **Atribución y marcas registradas:** Remmina es un proyecto de software libre licenciado bajo GNU GPL. **Remina Desktop** es un cliente no oficial e independiente; no está asociado, respaldado, patrocinado ni vinculado de ninguna forma a los autores, mantenedores u organizaciones detrás de Remmina o FreeRDP.
+
+### Evidencia de investigación
+La investigación técnica original se realizó sobre Remmina 1.4.43 y su plugin RDP mediante herramientas de análisis estático (REA MCP + Hopper). Los hallazgos, procedimientos y mapeos de configuración se encuentran detallados en el [Informe técnico](docs/reverse-engineering/REPORT.md) y el [índice de evidencias](docs/reverse-engineering/evidence.json).
+
+Referencias primarias: [FreeRDP](https://github.com/FreeRDP/FreeRDP), [configuración Remmina](https://remmina.gitlab.io/remminadoc.gitlab.io/md__builds__remmina_remmina_ci__remmina_wiki__remmina__config__file__options.html), [ubicación de código en bundles macOS](https://developer.apple.com/documentation/bundleresources/placing-content-in-a-bundle), [firma de código anidado](https://developer.apple.com/library/archive/technotes/tn2206/). Las licencias de las bibliotecas incluidas se conservan íntegramente en el paquete.

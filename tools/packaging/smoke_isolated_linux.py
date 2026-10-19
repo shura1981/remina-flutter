@@ -43,7 +43,7 @@ try:
     for _ in range(32):
         time.sleep(0.2)
         tree = subprocess.run(['xwininfo', '-display', display, '-root', '-tree'], capture_output=True, text=True).stdout
-        match = re.search(r'(0x[0-9a-f]+) "Remina"', tree)
+        match = re.search(r'(0x[0-9a-f]+) "Remina(?: Desktop)?"', tree)
         if match:
             window = subprocess.run(['xwininfo', '-display', display, '-id', match[1]], capture_output=True, text=True).stdout
             if 'Map State: IsViewable' in window:
