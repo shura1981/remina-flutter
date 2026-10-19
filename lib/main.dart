@@ -945,6 +945,11 @@ class _ConnectionLibraryState extends State<ConnectionLibrary>
             searchFocus.requestFocus(),
         const SingleActivator(LogicalKeyboardKey.keyF, control: true): () =>
             searchFocus.requestFocus(),
+        const SingleActivator(LogicalKeyboardKey.escape): () {
+          if (selectedId != null) {
+            setState(() => selectedId = null);
+          }
+        },
       },
       child: Focus(
         autofocus: true,
@@ -1657,7 +1662,8 @@ class _ConnectionLibraryState extends State<ConnectionLibrary>
       borderRadius: BorderRadius.circular(9),
       child: InkWell(
         borderRadius: BorderRadius.circular(9),
-        onTap: () => setState(() => selectedId = p.id),
+        onTap: () =>
+            setState(() => selectedId = selectedId == p.id ? null : p.id),
         onDoubleTap: () => _connect(p),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(13, 13, 7, 13),
@@ -1777,16 +1783,21 @@ class _ConnectionLibraryState extends State<ConnectionLibrary>
         children: [
           Row(
             children: [
-              const Text(
-                'DETALLES DEL EQUIPO',
-                style: TextStyle(
-                  fontSize: 9,
-                  letterSpacing: 1,
-                  color: Colors.grey,
+              const Expanded(
+                child: Text(
+                  'DETALLES DEL EQUIPO',
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 9,
+                    letterSpacing: 1,
+                    color: Colors.grey,
+                  ),
                 ),
               ),
-              const Spacer(),
               IconButton(
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
                 tooltip: 'Favorita',
                 onPressed: () => _profileAction('favorite', p),
                 icon: Icon(

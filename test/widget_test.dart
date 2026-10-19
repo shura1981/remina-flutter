@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui' show AppExitResponse;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:remina/main.dart';
@@ -265,4 +266,46 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Migración y Copia de Seguridad'), findsNothing);
   });
+
+  testWidgets(
+    'details side panel can be closed by re-tapping item or pressing Escape key',
+    (tester) async {
+      await repository.save(
+        RemminaProfile(
+          id: 'test-profile',
+          values: {
+            'name': 'Servidor Prueba',
+            'server': '192.168.1.100',
+            'protocol': 'RDP',
+            'username': 'admin',
+          },
+        ),
+      );
+      await openLibrary(tester, const Size(1280, 800));
+
+      expect(find.text('DETALLES DEL EQUIPO'), findsNothing);
+
+      // 1. Tapping row opens details panel
+      await tester.tap(find.text('Servidor Prueba'));
+      await tester.pump(const Duration(milliseconds: 350));
+      await tester.pumpAndSettle();
+      expect(find.text('DETALLES DEL EQUIPO'), findsOneWidget);
+
+      // 2. Tapping row again toggles and closes details panel
+      await tester.tap(find.text('Servidor Prueba').first);
+      await tester.pump(const Duration(milliseconds: 350));
+      await tester.pumpAndSettle();
+      expect(find.text('DETALLES DEL EQUIPO'), findsNothing);
+
+      // 3. Opening details panel and pressing Escape key closes it
+      await tester.tap(find.text('Servidor Prueba'));
+      await tester.pump(const Duration(milliseconds: 350));
+      await tester.pumpAndSettle();
+      expect(find.text('DETALLES DEL EQUIPO'), findsOneWidget);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.text('DETALLES DEL EQUIPO'), findsNothing);
+    },
+  );
 }
