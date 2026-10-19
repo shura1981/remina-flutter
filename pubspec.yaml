@@ -65,6 +65,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/branding/remina-mark-128.png
+    - assets/branding/remina-mark-256.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

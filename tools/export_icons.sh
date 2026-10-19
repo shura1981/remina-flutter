@@ -24,4 +24,6 @@ for task_icon_size in 64 128 256; do
     -resize "${task_icon_size}x${task_icon_size}" -strip \
     "assets/branding/remina-mark-${task_icon_size}.png"
 done
-echo 'Exportados: master 1024 px, marca 64/128/256 px y catálogo macOS 16–1024 px.'
+convert assets/branding/remina-macos.png -define icon:auto-resize=256,128,64,48,32,16 \
+  windows/runner/resources/app_icon.ico
+echo 'Exportados: master 1024 px, marca 64/128/256 px, catálogo macOS 16–1024 px y Windows app_icon.ico.'

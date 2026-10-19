@@ -32,8 +32,24 @@ static void my_application_activate(GApplication* application) {
 
   gtk_window_set_title(window, "Remina Desktop");
 
-
-
+  const gchar* bundle_dir = g_getenv("REMINA_BUNDLE_DIR");
+  g_autofree gchar* icon_path = nullptr;
+  if (bundle_dir != nullptr) {
+    icon_path = g_build_filename(
+        bundle_dir, "data", "flutter_assets", "assets", "branding",
+        "remina-mark-256.png", nullptr);
+  } else {
+    g_autofree gchar* exe_path = g_file_read_link("/proc/self/exe", nullptr);
+    if (exe_path != nullptr) {
+      g_autofree gchar* exe_dir = g_path_get_dirname(exe_path);
+      icon_path = g_build_filename(
+          exe_dir, "data", "flutter_assets", "assets", "branding",
+          "remina-mark-256.png", nullptr);
+    }
+  }
+  if (icon_path != nullptr && g_file_test(icon_path, G_FILE_TEST_EXISTS)) {
+    gtk_window_set_icon_from_file(window, icon_path, nullptr);
+  }
 
   gtk_window_set_default_size(window, 1280, 800);
   gtk_widget_set_size_request(GTK_WIDGET(window), 1040, 680);
